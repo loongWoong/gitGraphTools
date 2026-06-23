@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "git-graph"
+version = "1.0.0"
+description = "Interactive git branch relationship visualization — generates standalone HTML from any git repository."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [{ name = "mypalantir" }]
+keywords = ["git", "graph", "visualization", "branch", "tool"]
+classifiers = [
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development :: Version Control :: Git",
+]
+# Zero third-party dependencies — stdlib only.
+dependencies = []
+
+[project.scripts]
+git-graph = "git_graph:main"
+
+[tool.setuptools]
+packages = ["git_graph"]
