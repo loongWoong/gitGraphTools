@@ -13,10 +13,13 @@ Examples:
 from __future__ import annotations
 
 import argparse
+import logging
 import os
 import sys
 import webbrowser
 from typing import Optional
+
+logger = logging.getLogger("git_graph")
 
 # Allow running as both `python git_graph.py` and `python -m git_graph`
 try:
@@ -43,6 +46,7 @@ try:
         compute_all_health,
         compute_repo_health,
         count_by_status,
+        set_language,
     )
     from git_graph.temporal_analyzer import (
         compute_heatmap,
@@ -81,6 +85,7 @@ except ImportError:
         compute_all_health,
         compute_repo_health,
         count_by_status,
+        set_language,
     )
     from git_graph.temporal_analyzer import (
         compute_heatmap,
@@ -151,9 +156,39 @@ Examples:
     )
 
     parser.add_argument(
+        "--mcp",
+        action="store_true",
+        default=False,
+        help="Enable MCP server endpoint (POST /mcp) when --serve is active.",
+    )
+
+    parser.add_argument(
+        "--watch",
+        action="store_true",
+        default=False,
+        help="Enable live-reload via SSE when --serve is active.",
+    )
+
+    from git_graph import __version__
+
+    parser.add_argument(
         "--version",
         action="version",
-        version="git-graph 2.0.0",
+        version=f"git-graph {__version__}",
+    )
+
+    parser.add_argument(
+        "--lang",
+        choices=["en", "zh"],
+        default="en",
+        help="Language for warning messages (default: en).",
+    )
+
+    parser.add_argument(
+        "--config",
+        type=str,
+        default=None,
+        help="Path to JSON config file for overriding defaults.",
     )
 
     return parser
@@ -177,6 +212,18 @@ def main(argv: Optional[list[str]] = None) -> int:
 
     repo_path = os.path.abspath(args.repo_path)
 
+    # ── Load configuration ──
+    from git_graph.config import load_config
+    config = load_config(args.config)
+    config.lang = args.lang  # CLI arg overrides config file
+    set_language(config.lang)
+
+    # Override defaults from config if not explicitly set
+    if args.output == "git_graph.html":
+        args.output = config.default_output
+    if args.port == 8765:
+        args.port = config.default_port
+
     if not os.path.isdir(repo_path):
         print(f"Error: '{repo_path}' is not a valid directory.", file=sys.stderr)
         return 1
@@ -190,27 +237,33 @@ def main(argv: Optional[list[str]] = None) -> int:
         return 2
 
     try:
-        print(f"Reading git history from: {repo_path}")
+        logging.basicConfig(
+            level=logging.INFO,
+            format="%(message)s",
+            stream=sys.stderr,
+        )
+
+        logger.info(f"Reading git history from: {repo_path}")
 
         # ── 1. Gather raw data ──
-        print("  - Fetching commits...")
+        logger.info("  - Fetching commits...")
         commit_lines = get_all_commits(repo_path, args.max_commits)
 
-        print("  - Fetching refs (branches + tags)...")
+        logger.info("  - Fetching refs (branches + tags)...")
         ref_lines = get_refs(repo_path)
 
-        print("  - Reading HEAD state...")
+        logger.info("  - Reading HEAD state...")
         head_branch, head_hash = get_head_state(repo_path)
         head_detached = head_branch is None
 
-        print("  - Detecting merged branches...")
+        logger.info("  - Detecting merged branches...")
         merged_set = get_merged_branches(repo_path)
 
         # ── 2. Parse ──
-        print("  - Parsing commits...")
+        logger.info("  - Parsing commits...")
         commits = parse_commits(commit_lines)
 
-        print("  - Parsing refs...")
+        logger.info("  - Parsing refs...")
         branches = parse_refs(ref_lines)
 
         # Mark HEAD branch
@@ -224,7 +277,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         mark_refs(commits, commit_map, branches)
 
         # ── 4. Fetch full commit messages ──
-        print("  - Fetching full commit messages...")
+        logger.info("  - Fetching full commit messages...")
         commit_hashes = [c.hash for c in commits]
         full_msgs = get_commit_messages_batch(repo_path, commit_hashes)
         for c in commits:
@@ -234,7 +287,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         branch_commits_map = _build_branch_commits_map(commits, commit_map)
 
         # ── 6. DAG Layout ──
-        print(f"  - Computing DAG layout ({len(commits)} commits, {len(branches)} branches)...")
+        logger.info(f"  - Computing DAG layout ({len(commits)} commits, {len(branches)} branches)...")
         graph_data = layout(
             repo_path=repo_path,
             commits=commits,
@@ -245,7 +298,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         )
 
         # ── 7. Intelligence Layer ──
-        print("  - Computing branch health scores...")
+        logger.info("  - Computing branch health scores...")
         health_results = compute_all_health(
             branches, commits, commit_map, merged_set, branch_commits_map,
         )
@@ -278,7 +331,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         health_map = {h.branch_name: h.status for h in health_results}
         merged_map = {h.branch_name: h.is_merged for h in health_results}
 
-        print("  - Computing temporal data...")
+        logger.info("  - Computing temporal data...")
         branch_lifetimes = compute_branch_lifetimes(
             branches, commits, commit_map, branch_commits_map,
         )
@@ -291,42 +344,125 @@ def main(argv: Optional[list[str]] = None) -> int:
         graph_data.date_markers = compute_date_markers(commits)
         graph_data.activity_stats = compute_activity_stats(commits)
 
-        print("  - Computing timeline fork/merge data...")
+        logger.info("  - Computing timeline fork/merge data...")
         graph_data.timeline = compute_timeline_branches(
             branches, commits, commit_map, branch_commits_map,
             graph_data.health, head_branch,
         )
 
         # ── 8. Author Layer ──
-        print("  - Computing author stats...")
+        logger.info("  - Computing author stats...")
         graph_data.author_stats = compute_author_stats(
             graph_data.commits, len(commits),
         )
 
-        print("  - Computing bus factor...")
+        logger.info("  - Computing bus factor...")
         file_authors = get_file_author_stats(repo_path)
         graph_data.bus_factor_warnings = compute_bus_factor(
-            file_authors, len(commits), top_n=10,
+            file_authors, len(commits),
+            top_n=config.bus_factor_top_n,
+            threshold_pct=config.bus_factor_threshold_pct,
+            min_commits=config.bus_factor_min_commits,
+        )
+
+        # ── 8b. Phase 1: Issue tracking + Sprints + Pulse ──
+        logger.info("  - Detecting issue/branch links...")
+        from git_graph.issue_tracker import link_issues_to_branches
+        graph_data.issue_links = link_issues_to_branches(
+            graph_data.branches, graph_data.health,
+        )
+
+        logger.info("  - Computing sprint analysis...")
+        from git_graph.sprint_analyzer import compute_sprints, compute_burndown
+        graph_data.sprints = compute_sprints(
+            graph_data.branches, graph_data.commits,
+            sprint_days=config.sprint_days,
+        )
+        burndown_data: dict[str, list] = {}
+        for sp in graph_data.sprints[:4]:  # burndown for last 4 sprints
+            burndown_data[sp["n"]] = compute_burndown(
+                sp, graph_data.branches, graph_data.commits,
+            )
+        graph_data.burndown = burndown_data
+
+        logger.info("  - Computing project pulse...")
+        from git_graph.pulse_analyzer import compute_pulse
+        graph_data.pulse = compute_pulse(
+            graph_data.commits, graph_data.branches,
+            graph_data.health, graph_data.issue_links,
+            inactive_days=config.pulse_inactive_days,
+            long_lived_days=config.pulse_long_lived_days,
+            behind_warn=config.pulse_behind_warn,
+        )
+
+        # ── 8c. Phase 2: DORA + PR + Churn ──
+        logger.info("  - Computing DORA metrics...")
+        from git_graph.dora_analyzer import compute_all_dora, compute_pr_metrics
+        graph_data.dora = compute_all_dora(
+            graph_data.commits, graph_data.branches, merged_set,
+        )
+        graph_data.pr_metrics = compute_pr_metrics(
+            graph_data.commits, merged_set,
+        )
+
+        logger.info("  - Computing code churn...")
+        from git_graph.git_reader import get_file_change_frequency
+        from git_graph.churn_analyzer import compute_churn_heatmap, detect_hotspots
+        file_changes = get_file_change_frequency(repo_path)
+        graph_data.churn = compute_churn_heatmap(file_changes)
+
+        # ── 8d. Phase 3: AI Insights ──
+        logger.info("  - Predicting conflict risks...")
+        from git_graph.conflict_predictor import predict_conflicts
+        graph_data.conflict_risks = predict_conflicts(
+            graph_data.branches, graph_data.health, repo_path,
+        )
+
+        logger.info("  - Generating branch summaries...")
+        from git_graph.summarizer import generate_branch_summary, generate_release_notes
+        summaries: dict[str, str] = {}
+        for b in graph_data.branches:
+            name = b.get("n", "")
+            if name:
+                summaries[name] = generate_branch_summary(name, graph_data.commits)
+        graph_data.branch_summaries = summaries
+        graph_data.release_notes = generate_release_notes(
+            graph_data.branches, graph_data.health,
+        )
+
+        # ── 8e. Phase 4: Dependencies + Cleanup ──
+        logger.info("  - Computing dependency graph...")
+        from git_graph.dependency_analyzer import compute_dependency_graph
+        graph_data.dependency_graph = compute_dependency_graph(
+            graph_data.branches,
+            graph_data.timeline.get("branches", []),
+            graph_data.health,
+        )
+
+        logger.info("  - Analyzing cleanup candidates...")
+        from git_graph.cleanup_analyzer import analyze_cleanup_candidates
+        graph_data.cleanup_suggestions = analyze_cleanup_candidates(
+            graph_data.branches, graph_data.health,
         )
 
         # ── 9. Generate HTML ──
-        print("  - Generating HTML dashboard...")
+        logger.info("  - Generating HTML dashboard...")
         from git_graph.html_builder import build_html
         html_str = build_html(graph_data)
 
         if not args.serve:
             # Static file mode
             output_path = write_html(graph_data, args.output)
-            print(f"\n[OK] Dashboard generated: {output_path}")
+            logger.info(f"\n[OK] Dashboard generated: {output_path}")
         else:
             # Server mode — HTML is kept in memory
             output_path = os.path.abspath(args.output)
-            print(f"\n[OK] Dashboard ready (server mode)")
+            logger.info(f"\n[OK] Dashboard ready (server mode)")
 
-        print(f"  {graph_data.metadata['total_commits']} commits")
-        print(f"  {graph_data.metadata['total_branches']} branches")
-        print(f"  {graph_data.metadata['total_lanes']} lanes")
-        print(f"  Repository health: {repo_health}/100")
+        logger.info(f"  {graph_data.metadata['total_commits']} commits")
+        logger.info(f"  {graph_data.metadata['total_branches']} branches")
+        logger.info(f"  {graph_data.metadata['total_lanes']} lanes")
+        logger.info(f"  Repository health: {repo_health}/100")
         if status_counts:
             status_names = {
                 "healthy": "healthy", "aging": "aging",
@@ -337,7 +473,7 @@ def main(argv: Optional[list[str]] = None) -> int:
                 f'{status_counts.get(k, 0)} {status_names.get(k, k)}'
                 for k in ["healthy", "aging", "merged_stale", "zombie_merged", "zombie_abandoned"]
             ]
-            print(f"  Status: {', '.join(parts)}")
+            logger.info(f"  Status: {', '.join(parts)}")
 
         # ── 10. Server mode ──
         if args.serve:
@@ -346,14 +482,24 @@ def main(argv: Optional[list[str]] = None) -> int:
                 dashboard_html=html_str,
                 repo_path=repo_path,
                 port=args.port,
-                open_browser=not args.open,  # server auto-opens; --open is redundant
+                open_browser=not args.open,
+                enable_mcp=args.mcp,
+                enable_watch=args.watch,
+                graph_data={
+                    "commits": graph_data.commits,
+                    "branches": graph_data.branches,
+                    "health": graph_data.health,
+                    "author_stats": graph_data.author_stats,
+                    "dora": graph_data.dora,
+                    "repo_health_score": graph_data.repo_health_score,
+                },
             )
             return 0
 
         # ── 11. Open in browser (static mode) ──
         if args.open:
             url = f"file:///{output_path.replace(os.sep, '/')}"
-            print(f"  Opening in browser: {url}")
+            logger.info(f"  Opening in browser: {url}")
             webbrowser.open(url)
 
         return 0

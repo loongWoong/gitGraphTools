@@ -619,6 +619,252 @@ body {
   font-size: 11px;
   color: var(--text-secondary);
 }
+
+/* ── P1: Pulse Banner ─────────────────────────────────────── */
+.pulse-banner {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  padding: 16px 20px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+}
+.pulse-card { text-align: center; }
+.pulse-card .pvalue { font-size: 28px; font-weight: 700; color: var(--text-primary); }
+.pulse-card .plabel { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+.pulse-card .ptrend { font-size: 12px; margin-top: 2px; }
+.trend-up { color: var(--healthy); }
+.trend-down { color: var(--zombie-abandoned); }
+.trend-flat { color: var(--text-secondary); }
+
+/* ── P1: Kanban Board ─────────────────────────────────────── */
+.kanban-board { display: flex; gap: 16px; padding: 16px; overflow-x: auto; flex: 1; }
+.kanban-column {
+  flex: 0 0 280px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: flex; flex-direction: column;
+  max-height: calc(100vh - 140px);
+}
+.kanban-column-header {
+  padding: 12px 16px;
+  font-weight: 600; font-size: 13px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.kanban-column-header .count {
+  font-size: 11px; color: var(--text-secondary);
+  background: var(--bg-tertiary); border-radius: 10px; padding: 1px 8px;
+}
+.kanban-column-body { flex: 1; overflow-y: auto; padding: 8px; }
+.kanban-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.kanban-card:hover { border-color: var(--text-link); }
+.kanban-card .kc-branch { font-size: 13px; font-weight: 600; color: var(--text-link); font-family: var(--font-mono); }
+.kanban-card .kc-issue { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+.kanban-card .kc-meta { font-size: 11px; color: var(--text-secondary); margin-top: 4px; display: flex; gap: 8px; align-items: center; }
+
+/* ── P1: Sprint Table ─────────────────────────────────────── */
+.sprint-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.sprint-table th, .sprint-table td {
+  padding: 8px 12px; text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.sprint-table th { color: var(--text-secondary); font-weight: 500; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; }
+.sprint-table td { color: var(--text-primary); }
+.burndown-chart { width: 100%; height: 160px; margin-top: 12px; }
+
+/* ── P2: DORA Grid ────────────────────────────────────────── */
+.dora-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px; padding: 16px;
+}
+.dora-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  text-align: center;
+}
+.dora-card .dmvalue { font-size: 36px; font-weight: 700; color: var(--text-link); }
+.dora-card .dmlabel { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+.dora-card .dmsub { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+.lead-time-chart { width: 100%; height: 200px; margin: 16px 0; }
+.churn-treemap { padding: 16px; }
+.churn-item {
+  display: flex; align-items: center; padding: 6px 10px;
+  border-radius: 4px; margin-bottom: 3px; font-size: 12px;
+}
+.churn-item .chname { flex: 1; font-family: var(--font-mono); font-size: 11px; }
+.churn-item .chcount { font-size: 11px; color: var(--text-secondary); margin-left: 12px; }
+.hotspot-badge {
+  display: inline-block; padding: 1px 6px; border-radius: 3px;
+  background: #f8514933; color: var(--zombie-abandoned); font-size: 10px; font-weight: 600;
+  margin-left: 6px;
+}
+
+/* ── P3: Conflict Alerts ──────────────────────────────────── */
+.conflict-alert {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--aging);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  margin-bottom: 8px;
+}
+.conflict-alert.high-risk { border-left-color: var(--zombie-abandoned); background: #f8514910; }
+.conflict-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.conflict-branches { font-family: var(--font-mono); font-size: 13px; }
+.conflict-score { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+.conflict-score.risky { background: #f8514933; color: var(--zombie-abandoned); }
+.conflict-files { font-size: 11px; color: var(--text-secondary); }
+
+/* ── AI: NL Query ─────────────────────────────────────────── */
+.nl-query-box { display: flex; gap: 8px; margin: 16px 0; }
+.nl-input {
+  flex: 1; padding: 10px 14px;
+  background: var(--bg-primary); border: 1px solid var(--border);
+  border-radius: var(--radius); color: var(--text-primary);
+  font-size: 13px; font-family: var(--font-body);
+}
+.nl-input:focus { outline: none; border-color: var(--text-link); }
+.nl-btn {
+  padding: 10px 18px;
+  background: var(--text-link); color: #fff; border: none;
+  border-radius: var(--radius); font-size: 13px; cursor: pointer;
+  font-weight: 500;
+}
+.nl-results { margin-top: 12px; }
+.nl-result-item {
+  padding: 8px 12px; border-bottom: 1px solid var(--border);
+  font-size: 13px; color: var(--text-primary);
+}
+
+/* ── P4: Dependency Graph ─────────────────────────────────── */
+.dep-graph-container { flex: 1; overflow: auto; position: relative; }
+.dep-node {
+  cursor: pointer; transition: opacity 0.2s;
+  fill: var(--bg-secondary); stroke: var(--border); stroke-width: 2;
+}
+.dep-node:hover { stroke: var(--text-link); stroke-width: 3; }
+.dep-node.main { fill: #58a6ff22; stroke: var(--text-link); }
+.dep-label { font-size: 11px; font-family: var(--font-mono); fill: var(--text-primary); pointer-events: none; }
+.dep-edge { stroke: var(--border); stroke-width: 1.5; fill: none; marker-end: url(#arrowhead); }
+#dep-graph-svg { min-width: 100%; min-height: 100%; }
+
+/* ── P4: Cleanup List ─────────────────────────────────────── */
+.cleanup-row {
+  display: flex; align-items: center; padding: 8px 12px;
+  border-bottom: 1px solid var(--border); gap: 12px;
+  font-size: 12px;
+}
+.cleanup-row .safe-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.cleanup-row .safe-dot.safe { background: var(--healthy); }
+.cleanup-row .safe-dot.warn { background: var(--aging); }
+.cleanup-row .cl-name { font-family: var(--font-mono); font-size: 13px; font-weight: 500; flex: 1; }
+.cleanup-row .cl-reason { color: var(--text-secondary); flex: 2; }
+.cleanup-row .cl-cmd {
+  font-family: var(--font-mono); font-size: 10px;
+  color: var(--text-secondary); background: var(--bg-tertiary);
+  padding: 3px 8px; border-radius: 4px; cursor: pointer;
+}
+.btn-cleanup-all {
+  margin: 8px 12px; padding: 8px 16px;
+  background: var(--healthy); color: #fff; border: none;
+  border-radius: var(--radius); font-size: 12px; cursor: pointer; font-weight: 500;
+}
+
+/* ── P4: Command Palette ──────────────────────────────────── */
+.palette-overlay {
+  display: none; position: fixed; inset: 0;
+  background: #00000099; z-index: 9999;
+  justify-content: center; padding-top: 15vh;
+}
+.palette-overlay.open { display: flex; }
+.palette-box {
+  width: 600px; max-height: 400px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 16px 48px #00000066;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.palette-input {
+  padding: 14px 18px; font-size: 15px;
+  background: transparent; border: none; border-bottom: 1px solid var(--border);
+  color: var(--text-primary); font-family: var(--font-body); outline: none;
+}
+.palette-results { flex: 1; overflow-y: auto; }
+.palette-group { padding: 4px 0; }
+.palette-group-label {
+  padding: 6px 18px; font-size: 10px; color: var(--text-secondary);
+  text-transform: uppercase; letter-spacing: 1px; font-weight: 600;
+}
+.palette-result {
+  padding: 8px 18px; font-size: 13px; color: var(--text-primary);
+  cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+}
+.palette-result.selected { background: var(--bg-tertiary); }
+.palette-result .pr-shortcut { font-size: 10px; color: var(--text-secondary); }
+
+/* ── P4: Keyboard Shortcuts Modal ─────────────────────────── */
+.shortcuts-modal {
+  display: none; position: fixed; inset: 0;
+  background: #00000099; z-index: 10000;
+  justify-content: center; align-items: center;
+}
+.shortcuts-modal.open { display: flex; }
+.shortcuts-box {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px; padding: 24px;
+  max-width: 500px; width: 90%; max-height: 70vh; overflow-y: auto;
+}
+.shortcuts-box h2 { font-size: 16px; margin-bottom: 16px; color: var(--text-primary); }
+.shortcuts-table { width: 100%; border-collapse: collapse; }
+.shortcuts-table td { padding: 6px 0; font-size: 13px; color: var(--text-primary); border-bottom: 1px solid var(--border); }
+.shortcuts-table td:first-child {
+  font-family: var(--font-mono); font-size: 12px;
+  color: var(--text-link); font-weight: 500; width: 140px;
+}
+
+/* ── P4: Live Reload Notification ─────────────────────────── */
+#live-notify {
+  display: none; position: fixed; top: 0; left: 0; right: 0;
+  background: var(--text-link); color: #fff; text-align: center;
+  padding: 8px; font-size: 12px; cursor: pointer; z-index: 9998;
+}
+
+/* ── P5: Multi-Repo Compare ───────────────────────────────── */
+.compare-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px; padding: 16px;
+}
+.compare-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.compare-card h3 { font-size: 15px; color: var(--text-link); margin-bottom: 12px; }
+.compare-card .cm-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 12px; }
+.compare-card .cm-row .cmlabel { color: var(--text-secondary); }
+.compare-card .cm-row .cmvalue { color: var(--text-primary); }
 </style>
 </head>
 <body>
@@ -630,6 +876,10 @@ body {
   <button class="tab-btn" data-tab="timeline">Timeline</button>
   <button class="tab-btn" data-tab="authors">Authors</button>
   <button class="tab-btn" data-tab="ai">AI Insights</button>
+  <button class="tab-btn" data-tab="board">Board</button>
+  <button class="tab-btn" data-tab="dora">DORA+</button>
+  <button class="tab-btn" data-tab="deps">Dependencies</button>
+  <button class="tab-btn" id="compare-tab-btn" style="display:none" data-tab="compare">Compare</button>
   <span style="flex:1"></span>
   <button id="theme-toggle" title="Toggle light/dark theme" style="background:none;border:1px solid var(--border);color:var(--text-secondary);cursor:pointer;padding:4px 10px;border-radius:var(--radius);font-size:14px;">&#x263C;</button>
 </div>
@@ -708,14 +958,111 @@ body {
 
 <!-- ── AI Insights Tab ─────────────────────────────────────────── -->
 <div class="tab-content" id="ai-tab">
-  <div class="placeholder">
-    <h2>AI Insights</h2>
-    <p>Select a branch on the Graph or Timeline tab to generate an AI-powered summary.<br>This feature will be available when an AI provider is configured.</p>
+  <div style="padding:24px;flex:1;overflow-y:auto;">
+    <!-- Natural Language Query -->
+    <div class="section-card">
+      <h3>Ask About Your Repository</h3>
+      <div class="nl-query-box">
+        <input class="nl-input" id="nl-input" placeholder="e.g. who committed most, branches not updated, conflict risk, safe to delete, hotspot files..." />
+        <button class="nl-btn" id="nl-search-btn">Ask</button>
+      </div>
+      <div id="nl-results" class="nl-results"></div>
+    </div>
+
+    <!-- Conflict Risks -->
+    <div class="section-card" style="margin-top:16px">
+      <h3>Merge Conflict Risks</h3>
+      <div id="conflict-risks"></div>
+    </div>
+
+    <!-- Branch Summaries -->
+    <div class="section-card" style="margin-top:16px">
+      <h3>Branch Summaries</h3>
+      <div id="branch-summaries"></div>
+    </div>
+
+    <!-- Release Notes -->
+    <div class="section-card" style="margin-top:16px">
+      <h3>Release Notes Draft</h3>
+      <pre id="release-notes" style="font-size:12px;color:var(--text-secondary);white-space:pre-wrap;max-height:300px;overflow-y:auto;padding:12px;background:var(--bg-primary);border-radius:var(--radius);"></pre>
+      <button id="copy-rn-btn" class="nl-btn" style="margin-top:8px">Copy Release Notes</button>
+    </div>
   </div>
 </div>
 
-<!-- Tooltip -->
-<div id="tooltip"></div>
+<!-- ── Board Tab (Kanban) ───────────────────────────────────── -->
+<div class="tab-content" id="board-tab">
+  <div class="kanban-board" id="kanban-board"></div>
+</div>
+
+<!-- ── DORA+ Tab ────────────────────────────────────────────── -->
+<div class="tab-content" id="dora-tab">
+  <div style="padding:16px;overflow-y:auto;flex:1;">
+    <div class="section-card"><h3>DORA Metrics</h3><div class="dora-grid" id="dora-grid"></div></div>
+    <div class="section-card" style="margin-top:16px"><h3>Lead Time Distribution</h3><svg class="lead-time-chart" id="lead-time-chart"></svg></div>
+    <div class="section-card" style="margin-top:16px"><h3>PR Merge Methods</h3><div id="pr-methods"></div></div>
+    <div class="section-card" style="margin-top:16px"><h3>Code Churn Heatmap</h3><div class="churn-treemap" id="churn-treemap"></div></div>
+  </div>
+</div>
+
+<!-- ── Dependencies Tab ─────────────────────────────────────── -->
+<div class="tab-content" id="deps-tab">
+  <div style="padding:12px;flex:1;overflow:hidden;display:flex;flex-direction:column;">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:0 8px 8px;">
+      <h3 style="font-size:14px;color:var(--text-primary);">Branch Dependency Graph</h3>
+      <span style="font-size:11px;color:var(--text-secondary);">Click node to highlight branch</span>
+    </div>
+    <div class="dep-graph-container" id="dep-graph-container">
+      <svg id="dep-graph-svg"></svg>
+    </div>
+    <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px;">
+      <h3 style="font-size:13px;color:var(--text-primary);padding:0 8px 8px;">Safe Deletion Candidates</h3>
+      <div id="cleanup-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Compare Tab (hidden unless --compare) ─────────────────── -->
+<div class="tab-content" id="compare-tab">
+  <div style="padding:16px;overflow-y:auto;flex:1">
+    <div class="compare-grid" id="compare-grid"></div>
+  </div>
+</div>
+
+<!-- Command Palette -->
+<div class="palette-overlay" id="palette-overlay">
+  <div class="palette-box">
+    <input class="palette-input" id="palette-input" placeholder="Search branches, commits, authors, views..." />
+    <div class="palette-results" id="palette-results"></div>
+  </div>
+</div>
+
+<!-- Keyboard Shortcuts Modal -->
+<div class="shortcuts-modal" id="shortcuts-modal">
+  <div class="shortcuts-box">
+    <h2>Keyboard Shortcuts</h2>
+    <table class="shortcuts-table">
+      <tr><td>Ctrl+K / Cmd+K</td><td>Open command palette</td></tr>
+      <tr><td>Escape</td><td>Close palette / Clear selection</td></tr>
+      <tr><td>1-8</td><td>Switch tabs (1=Overview, 2=Graph, ...)</td></tr>
+      <tr><td>g g</td><td>Go to Graph view</td></tr>
+      <tr><td>g o</td><td>Go to Overview</td></tr>
+      <tr><td>g t</td><td>Go to Timeline</td></tr>
+      <tr><td>g a</td><td>Go to Authors</td></tr>
+      <tr><td>g i</td><td>Go to AI Insights</td></tr>
+      <tr><td>g b</td><td>Go to Board</td></tr>
+      <tr><td>g d</td><td>Go to Dependencies</td></tr>
+      <tr><td>?</td><td>Show this help</td></tr>
+      <tr><td>/</td><td>Focus search (Graph view)</td></tr>
+      <tr><td>F</td><td>Fit graph to screen</td></tr>
+      <tr><td>+ / -</td><td>Zoom in / out</td></tr>
+      <tr><td>Shift+J / Shift+K</td><td>Cycle branch highlight</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- Live Reload Notification -->
+<div id="live-notify">Repository updated — click to refresh</div>
 
 <script>
 // ── Constants ───────────────────────────────────────────────────────
@@ -1445,14 +1792,230 @@ function renderAuthors() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// P1-P5: Extended render functions
+// ═══════════════════════════════════════════════════════════════════
+
+function renderPulse() {
+  const pu = DATA.pu || {};
+  const ws = pu.ws || {}, rb = pu.rb || [], tr = pu.tr || {};
+  if (!Object.keys(ws).length) return;
+  const weeks = Object.keys(ws).sort();
+  const latest = ws[weeks[weeks.length - 1]] || {};
+  const cc = tr.commits_change_pct || 0, bc = tr.branches_change_pct || 0;
+  let h = '<div class="pulse-banner">';
+  h += `<div class="pulse-card"><div class="pvalue">${latest.commits || 0}</div><div class="plabel">Commits This Week</div><div class="ptrend ${cc > 5 ? 'trend-up' : cc < -5 ? 'trend-down' : 'trend-flat'}">${cc >= 0 ? '+' : ''}${cc}% vs last week</div></div>`;
+  h += `<div class="pulse-card"><div class="pvalue">${latest.branches || 0}</div><div class="plabel">Active Branches</div><div class="ptrend ${bc > 5 ? 'trend-up' : bc < -5 ? 'trend-down' : 'trend-flat'}">${bc >= 0 ? '+' : ''}${bc}%</div></div>`;
+  h += `<div class="pulse-card"><div class="pvalue">${latest.authors || 0}</div><div class="plabel">Active Authors</div></div>`;
+  h += `<div class="pulse-card"><div class="pvalue">${rb.length}</div><div class="plabel">Risk Branches</div></div></div>`;
+  if (rb.length > 0) {
+    h += '<div class="section-card" style="margin-top:8px"><h3>&#x26A0; Risk Branches</h3>';
+    rb.slice(0, 5).forEach(r => { const sev = r.severity === 'high' ? '&#x1F534;' : r.severity === 'medium' ? '&#x1F7E0;' : '&#x1F7E1;'; h += `<div style="padding:4px 0;font-size:12px;">${sev} <b>${escHtml(r.n)}</b>: ${escHtml(r.reason)}</div>`; });
+    h += '</div>';
+  }
+  const overviewTab = document.getElementById('overview-tab');
+  const existing = overviewTab.querySelector('.pulse-container');
+  if (existing) existing.remove();
+  const div = document.createElement('div'); div.className = 'pulse-container'; div.innerHTML = h;
+  overviewTab.insertBefore(div, overviewTab.firstChild);
+}
+
+function renderKanban() {
+  const il = DATA.il || {}, healthLookup = {};
+  (DATA.health || []).forEach(h => { healthLookup[h.n] = h; });
+  const cols = { todo: { label: 'Todo', branches: [] }, in_progress: { label: 'In Progress', branches: [] }, review: { label: 'Review', branches: [] }, done: { label: 'Done', branches: [] } };
+  for (const [k, info] of Object.entries(il)) {
+    const col = cols[info.st] || cols.todo;
+    (info.b || []).forEach(bn => { col.branches.push({ branch: bn, issue: k, health: healthLookup[bn] || {} }); });
+  }
+  const linkedBranches = new Set();
+  for (const info of Object.values(il)) { (info.b || []).forEach(b => linkedBranches.add(b)); }
+  (DATA.branches || []).forEach(b => {
+    if (!linkedBranches.has(b.n) && b.k === 'local' && !['main', 'master', 'develop', 'dev'].includes(b.n)) {
+      const h = healthLookup[b.n] || {};
+      cols[h.mg ? 'done' : h.st === 'aging' ? 'in_progress' : 'todo'].branches.push({ branch: b.n, issue: '', health: h });
+    }
+  });
+  let html = '';
+  for (const col of Object.values(cols)) {
+    html += `<div class="kanban-column"><div class="kanban-column-header">${col.label}<span class="count">${col.branches.length}</span></div><div class="kanban-column-body">`;
+    col.branches.forEach(item => { const h = item.health; html += `<div class="kanban-card" onclick="switchTab('graph');highlightBranch('${escHtml(item.branch)}')"><div class="kc-branch">${statusDot(h.st || 'healthy')} ${escHtml(item.branch)}</div>${item.issue ? '<div class="kc-issue">' + escHtml(item.issue) + '</div>' : ''}<div class="kc-meta"><span>${h.cc || 0} commits</span><span>${(h.ld || '').slice(0, 10)}</span></div></div>`; });
+    html += '</div></div>';
+  }
+  document.getElementById('kanban-board').innerHTML = html || '<div style="padding:24px;color:var(--text-secondary);">No issue-tracked branches found. Use branch naming: feature/PROJ-123 or fix/ISSUE-456.</div>';
+}
+
+function renderSprints() {
+  const sp = DATA.sp || [], bd = DATA.bd || {};
+  if (!sp.length) return;
+  const overviewTab = document.getElementById('overview-tab');
+  let existing = overviewTab.querySelector('.sprint-section');
+  if (existing) existing.remove();
+  let html = '<div class="sprint-section section-card"><h3>Sprint Analysis</h3><table class="sprint-table"><tr><th>Sprint</th><th>Period</th><th>Planned</th><th>Completed</th><th>Commits</th><th>Scope</th></tr>';
+  sp.slice(-6).reverse().forEach(s => { html += `<tr><td>${escHtml(s.n)}</td><td>${s.st} ~ ${s.ed}</td><td>${s.pb}</td><td>${s.cb}</td><td>${s.cc}</td><td>+${s.sc}</td></tr>`; });
+  html += '</table>';
+  const lastSprint = sp[sp.length - 1];
+  if (lastSprint && bd[lastSprint.n]) { html += `<h3 style="margin-top:12px;font-size:13px;">Burndown: ${escHtml(lastSprint.n)}</h3><svg class="burndown-chart" id="burndown-svg"></svg>`; }
+  html += '</div>';
+  const div = document.createElement('div'); div.className = 'sprint-section'; div.innerHTML = html; overviewTab.appendChild(div);
+  if (lastSprint && bd[lastSprint.n]) {
+    setTimeout(() => {
+      const svg = document.getElementById('burndown-svg'); if (!svg) return;
+      const data = bd[lastSprint.n]; if (!data.length) return;
+      const w = svg.parentElement.clientWidth - 40, h = 150, maxR = Math.max(...data.map(d => d.r), 1);
+      svg.setAttribute('viewBox', `0 0 ${w + 40} ${h + 30}`);
+      const stepX = w / Math.max(1, data.length - 1);
+      let pathD = '', pts = '';
+      data.forEach((d, i) => { const x = 20 + i * stepX, y = 10 + (1 - d.r / maxR) * (h - 20); pathD += (i === 0 ? 'M' : 'L') + `${x},${y} `; pts += x + ',' + y + ' '; });
+      svg.innerHTML = `<line x1="20" y1="${h + 10}" x2="${w + 20}" y2="${h + 10}" stroke="var(--border)"/><line x1="20" y1="10" x2="20" y2="${h + 10}" stroke="var(--border)"/><path d="${pathD}" fill="none" stroke="var(--text-link)" stroke-width="2"/><polygon points="${pts}" fill="var(--text-link)" fill-opacity="0.15"/>`;
+    }, 100);
+  }
+}
+
+function renderDORA() {
+  const dr = DATA.dr || {};
+  if (!Object.keys(dr).length) { document.getElementById('dora-grid').innerHTML = '<p style="color:var(--text-secondary);padding:12px;">DORA metrics unavailable.</p>'; return; }
+  const lt = dr.lt || {}, cfr = (dr.cfr || 0) * 100;
+  document.getElementById('dora-grid').innerHTML = `
+    <div class="dora-card"><div class="dmvalue">${dr.df || 0}</div><div class="dmlabel">Deployment Frequency</div><div class="dmsub">deploys/week</div></div>
+    <div class="dora-card"><div class="dmvalue">${lt.med || 0}h</div><div class="dmlabel">Lead Time (median)</div><div class="dmsub">P75: ${lt.p75 || 0}h</div></div>
+    <div class="dora-card"><div class="dmvalue">${cfr.toFixed(1)}%</div><div class="dmlabel">Change Failure Rate</div><div class="dmsub">revert/hotfix ratio</div></div>
+    <div class="dora-card"><div class="dmvalue">${dr.mttr || 0}h</div><div class="dmlabel">Mean Time to Recovery</div><div class="dmsub">avg recovery</div></div>`;
+  const raw = lt.raw || [];
+  if (raw.length > 1) {
+    const svg = document.getElementById('lead-time-chart'), w = svg.parentElement.clientWidth - 40, h = 180, maxV = Math.max(...raw, 1);
+    svg.setAttribute('viewBox', `0 0 ${w + 40} ${h + 30}`);
+    const stepX = w / Math.max(1, raw.length - 1);
+    let pathD = '';
+    raw.forEach((v, i) => { pathD += (i === 0 ? 'M' : 'L') + `${20 + i * stepX},${10 + (1 - v / maxV) * (h - 20)} `; });
+    svg.innerHTML = `<line x1="20" y1="${h + 10}" x2="${w + 20}" y2="${h + 10}" stroke="var(--border)"/><line x1="20" y1="10" x2="20" y2="${h + 10}" stroke="var(--border)"/><path d="${pathD}" fill="none" stroke="var(--text-link)" stroke-width="1.5"/>`;
+  }
+  const pr = DATA.pr || {}, mm = pr.merge_methods || {}, total = Math.max(1, (mm.merge || 0) + (mm.squash || 0) + (mm.rebase || 0));
+  document.getElementById('pr-methods').innerHTML = `<div style="display:flex;gap:24px;padding:12px;font-size:13px;"><div>Merge: <b>${mm.merge || 0}</b> (${((mm.merge || 0) / total * 100).toFixed(0)}%)</div><div>Squash: <b>${mm.squash || 0}</b> (${((mm.squash || 0) / total * 100).toFixed(0)}%)</div><div>Rebase: <b>${mm.rebase || 0}</b> (${((mm.rebase || 0) / total * 100).toFixed(0)}%)</div></div>`;
+}
+
+function renderChurn() {
+  const ch = DATA.ch || {}, files = ch.files || [], maxCount = files.length ? files[0].count : 1;
+  document.getElementById('churn-treemap').innerHTML = files.length ? files.map(f => {
+    const pct = f.count / maxCount, color = f.hotspot ? '#f85149' : `hsl(210,50%,${20 + pct * 30}%)`;
+    return `<div class="churn-item" style="border-left:3px solid ${color};background:${color}15;"><span class="chname">${escHtml(f.path)}</span>${f.hotspot ? '<span class="hotspot-badge">HOTSPOT</span>' : ''}<span class="chcount">${f.count}</span></div>`;
+  }).join('') : '<p style="padding:12px;color:var(--text-secondary);">No file change data.</p>';
+}
+
+function renderConflictRisks() {
+  const cr = DATA.cr || [];
+  document.getElementById('conflict-risks').innerHTML = cr.length ? cr.map(c => {
+    const isHigh = c.rs > 0.5;
+    return `<div class="conflict-alert ${isHigh ? 'high-risk' : ''}"><div class="conflict-header"><span class="conflict-branches">${escHtml(c.b1)} &#x2194; ${escHtml(c.b2)}</span><span class="conflict-score ${isHigh ? 'risky' : ''}">${(c.rs * 100).toFixed(0)}%</span></div>${c.sf && c.sf.length ? '<div class="conflict-files">Shared: ' + c.sf.map(escHtml).join(', ') + '</div>' : ''}</div>`;
+  }).join('') : '<p style="color:var(--text-secondary);padding:8px;">All clear! No active branch pairs with risk.</p>';
+}
+
+function renderAISummaries() {
+  const bs = DATA.bs || {};
+  const items = Object.entries(bs).slice(0, 10);
+  document.getElementById('branch-summaries').innerHTML = items.length ? items.map(([name, summary]) => `<div class="conflict-alert" style="border-left-color:var(--text-link);"><div class="conflict-branches">${escHtml(name)}</div><div class="conflict-files" style="margin-top:4px;">${escHtml(summary)}</div></div>`).join('') : '<p style="color:var(--text-secondary);padding:8px;">No branches to summarize.</p>';
+  document.getElementById('release-notes').textContent = DATA.rn || 'No release notes available.';
+  document.getElementById('copy-rn-btn').onclick = () => navigator.clipboard.writeText(DATA.rn || '').then(() => alert('Release notes copied!')).catch(() => {});
+}
+
+function processNLQuery(text) {
+  const lower = text.toLowerCase().trim(), res = document.getElementById('nl-results');
+  if (lower.includes('who commit') || lower.includes('most commit') || lower.includes('top author')) {
+    res.innerHTML = '<b>Top Authors:</b><br>' + (DATA.author_stats || []).slice(0, 5).map(a => `${escHtml(a.n)}: ${a.cc} commits (${a.pc}%)`).join('<br>');
+  } else if (lower.includes('branch') && (lower.includes('not updated') || lower.includes('inactive') || lower.includes('stale'))) {
+    const stale = (DATA.health || []).filter(h => h.ds > 14 && !['main', 'master', 'develop'].includes(h.n));
+    res.innerHTML = `<b>${stale.length} inactive branches (>14 days):</b><br>` + stale.map(h => `${escHtml(h.n)}: ${h.ds} days`).join('<br>');
+  } else if (lower.includes('conflict')) { switchTab('ai'); }
+  else if (lower.includes('safe to delete') || lower.includes('cleanup')) { switchTab('deps'); }
+  else if (lower.includes('hotspot') || lower.includes('churn')) { switchTab('dora'); }
+  else if (lower.includes('dora') || lower.includes('deploy')) { switchTab('dora'); }
+  else if (lower.includes('release note')) { switchTab('ai'); }
+  else if (lower.includes('depend')) { switchTab('deps'); }
+  else { res.innerHTML = '<b>Try:</b><br>&bull; "who committed most"<br>&bull; "branches not updated"<br>&bull; "conflict risk"<br>&bull; "safe to delete"<br>&bull; "hotspot files"<br>&bull; "DORA metrics"<br>&bull; "release notes"'; }
+}
+
+function renderDependencyGraph() {
+  const dg = DATA.dg || {}, ns = dg.ns || [], es = dg.es || [];
+  if (!ns.length) { document.getElementById('dep-graph-container').innerHTML = '<p style="padding:24px;color:var(--text-secondary);">No dependency data.</p>'; return; }
+  const svg = document.getElementById('dep-graph-svg'), NODE_W = 140, NODE_H = 32, H_GAP = 60, V_GAP = 20, MARGIN = 20;
+  const children = {}; ns.forEach(n => { children[n.n] = n.ch || []; });
+  const hasParent = new Set(es.map(e => e.to));
+  const roots = ns.filter(n => !hasParent.has(n.n)).map(n => n.n);
+  if (!roots.length) roots.push(ns[0].n);
+  const layers = [], visited = new Set();
+  let current = roots;
+  while (current.length > 0) { layers.push(current); const next = []; current.forEach(n => { visited.add(n); (children[n] || []).forEach(c => { if (!visited.has(c)) next.push(c); }); }); current = [...new Set(next)]; }
+  const maxNodes = Math.max(...layers.map(l => l.length), 1), totalW = maxNodes * (NODE_W + H_GAP) + MARGIN * 2, totalH = layers.length * (NODE_H + V_GAP) + MARGIN * 2;
+  svg.setAttribute('viewBox', `0 0 ${totalW} ${totalH}`); svg.style.width = totalW + 'px'; svg.style.height = totalH + 'px';
+  let svgInner = '<defs><marker id="arrowhead" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="var(--border)"/></marker></defs>';
+  const positions = {};
+  layers.forEach((layer, li) => { const y = MARGIN + li * (NODE_H + V_GAP), layerW = layer.length * (NODE_W + H_GAP), startX = (totalW - layerW) / 2; layer.forEach((name, ni) => { positions[name] = { x: startX + ni * (NODE_W + H_GAP) + H_GAP / 2, y }; }); });
+  es.forEach(e => { if (positions[e.f] && positions[e.to]) { const fx = positions[e.f].x + NODE_W / 2, fy = positions[e.f].y + NODE_H, tx = positions[e.to].x + NODE_W / 2, ty = positions[e.to].y; svgInner += `<path class="dep-edge" d="M${fx},${fy} C${fx},${(fy + ty) / 2} ${tx},${(fy + ty) / 2} ${tx},${ty}"/>`; } });
+  ns.forEach(n => { const pos = positions[n.n]; if (!pos) return; svgInner += `<rect class="dep-node ${n.k === 'main' ? 'main' : ''}" x="${pos.x}" y="${pos.y}" width="${NODE_W}" height="${NODE_H}" rx="6" onclick="highlightBranch('${escHtml(n.n)}');switchTab('graph');"/><text class="dep-label" x="${pos.x + NODE_W / 2}" y="${pos.y + NODE_H / 2 + 4}" text-anchor="middle">${escHtml(n.n)}</text>`; });
+  svg.innerHTML = svgInner;
+}
+
+function renderCleanupSuggestions() {
+  const cl = DATA.cl || [];
+  if (!cl.length) { document.getElementById('cleanup-list').innerHTML = '<p style="padding:12px;color:var(--text-secondary);">All good. No cleanup needed.</p>'; return; }
+  document.getElementById('cleanup-list').innerHTML = cl.map(c => `<div class="cleanup-row"><span class="safe-dot ${c.safe ? 'safe' : 'warn'}"></span><span class="cl-name">${escHtml(c.n)}</span><span class="cl-reason">${escHtml(c.reason)}</span><span class="cl-cmd" onclick="navigator.clipboard.writeText('${c.cmd.replace(/'/g, "\\'")}')" title="Click to copy">${escHtml(c.cmd)}</span></div>`).join('')
+    + `<button class="btn-cleanup-all" onclick="copyAllCleanup()">Copy All Safe Deletions (${cl.filter(c => c.safe).length})</button>`;
+}
+
+function copyAllCleanup() {
+  const cmds = (DATA.cl || []).filter(c => c.safe).map(c => c.cmd).join('\n');
+  if (cmds) navigator.clipboard.writeText(cmds).then(() => alert('Copied!')).catch(() => {});
+}
+
+function highlightBranch(name) { if (typeof toggleBranchHighlight === 'function') toggleBranchHighlight(name); }
+
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  const btn = document.querySelector(`[data-tab="${name}"]`), tab = document.getElementById(`${name}-tab`);
+  if (btn) btn.classList.add('active');
+  if (tab) tab.classList.add('active');
+  if (name === 'board') renderKanban();
+  if (name === 'dora') { renderDORA(); renderChurn(); }
+  if (name === 'deps') { renderDependencyGraph(); renderCleanupSuggestions(); }
+  if (name === 'ai') { renderConflictRisks(); renderAISummaries(); }
+  if (name === 'compare') renderComparison();
+}
+
+function renderComparison() {
+  const mc = DATA.mc || [];
+  if (!mc.length) return;
+  document.getElementById('compare-tab-btn').style.display = '';
+  document.getElementById('compare-grid').innerHTML = mc.map(r => {
+    const dr = r.dr || {};
+    return `<div class="compare-card"><h3>${escHtml(r.n)}</h3><div class="cm-row"><span class="cmlabel">Commits</span><span class="cmvalue">${r.tc}</span></div><div class="cm-row"><span class="cmlabel">Branches</span><span class="cmvalue">${r.tb}</span></div><div class="cm-row"><span class="cmlabel">Health</span><span class="cmvalue">${r.hs}/100</span></div><div class="cm-row"><span class="cmlabel">Authors</span><span class="cmvalue">${r.aa}</span></div><div class="cm-row"><span class="cmlabel">Deploy Freq</span><span class="cmvalue">${dr.df || 0}/wk</span></div><div class="cm-row"><span class="cmlabel">Lead Time</span><span class="cmvalue">${dr.lt ? dr.lt.med : 0}h</span></div></div>`;
+  }).join('');
+}
+
+function initLiveReload() {
+  if (typeof isServerMode === 'undefined' || !isServerMode) return;
+  try {
+    const es = new EventSource('/api/watch');
+    es.onmessage = (event) => {
+      try { if (JSON.parse(event.data).type === 'refs_changed') { const el = document.getElementById('live-notify'); el.style.display = 'block'; el.onclick = () => location.reload(); } } catch (e) {}
+    };
+    es.onerror = () => { es.close(); };
+  } catch (e) {}
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // Event Wiring
 // ═══════════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
   renderOverview();
+  renderPulse();
+  renderSprints();
   buildLegend();
   renderGraph();
   renderTimeline();
   renderAuthors();
+  renderConflictRisks();
+  renderAISummaries();
+  initLiveReload();
 
   // Theme toggle
   document.getElementById('theme-toggle').addEventListener('click', () => {
@@ -1539,6 +2102,32 @@ document.addEventListener('DOMContentLoaded', () => {
     applyTransform();
     updateMinimap();
   });
+  // ── P4: Command Palette + Keyboard Shortcuts ─────────
+  document.addEventListener('keydown', function(e) {
+    var ctrl = e.ctrlKey || e.metaKey;
+    if (ctrl && e.key === 'k') { e.preventDefault(); CommandPalette.open(); return; }
+    if (e.key === 'Escape') {
+      if (document.getElementById('palette-overlay').classList.contains('open')) { CommandPalette.close(); return; }
+      if (document.getElementById('shortcuts-modal').classList.contains('open')) { document.getElementById('shortcuts-modal').classList.remove('open'); return; }
+    }
+    if (document.getElementById('palette-overlay').classList.contains('open')) {
+      if (e.key === 'ArrowDown') { e.preventDefault(); CommandPalette.navigate(1); return; }
+      if (e.key === 'ArrowUp') { e.preventDefault(); CommandPalette.navigate(-1); return; }
+      if (e.key === 'Enter') { e.preventDefault(); CommandPalette.execute(CommandPalette._selectedIndex); return; }
+    }
+    if (!ctrl && !e.target.closest('input') && !e.target.closest('textarea') && !e.target.closest('[contenteditable]')) {
+      var tabs = ['overview', 'graph', 'timeline', 'authors', 'ai', 'board', 'dora', 'deps'];
+      var num = parseInt(e.key);
+      if (num >= 1 && num <= tabs.length) { e.preventDefault(); switchTab(tabs[num - 1]); return; }
+    }
+    if (!ctrl && e.key === '?' && !e.target.closest('input')) { e.preventDefault(); document.getElementById('shortcuts-modal').classList.add('open'); }
+    if (e.key === '/' && !e.target.closest('input') && !e.target.closest('textarea')) { e.preventDefault(); var si = document.getElementById('graph-search'); if (si) { switchTab('graph'); setTimeout(function() { si.focus(); }, 100); } }
+  });
+  document.getElementById('palette-input').addEventListener('input', function(e) { CommandPalette.search(e.target.value); });
+  document.getElementById('palette-overlay').addEventListener('click', function(e) { if (e.target === document.getElementById('palette-overlay')) CommandPalette.close(); });
+  document.getElementById('shortcuts-modal').addEventListener('click', function(e) { if (e.target === document.getElementById('shortcuts-modal')) document.getElementById('shortcuts-modal').classList.remove('open'); });
+  document.getElementById('nl-search-btn').addEventListener('click', function() { processNLQuery(document.getElementById('nl-input').value); });
+  document.getElementById('nl-input').addEventListener('keydown', function(e) { if (e.key === 'Enter') processNLQuery(e.target.value); });
 });
 </script>
 </body>

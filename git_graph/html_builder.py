@@ -35,6 +35,20 @@ def build_html(graph_data: GraphData) -> str:
         "repo_health_score": graph_data.repo_health_score,
         "status_counts": graph_data.status_counts,
         "timeline": graph_data.timeline,
+        # ── Phase 1-5 additions ──
+        "il": graph_data.issue_links,
+        "sp": graph_data.sprints,
+        "bd": graph_data.burndown,
+        "pu": graph_data.pulse,
+        "dr": graph_data.dora,
+        "pr": graph_data.pr_metrics,
+        "ch": graph_data.churn,
+        "cr": graph_data.conflict_risks,
+        "bs": graph_data.branch_summaries,
+        "rn": graph_data.release_notes,
+        "dg": graph_data.dependency_graph,
+        "cl": graph_data.cleanup_suggestions,
+        "mc": graph_data.multi_repo,
     }
 
     json_str = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))

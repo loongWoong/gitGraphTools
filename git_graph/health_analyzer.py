@@ -13,6 +13,46 @@ from typing import Optional
 from .data_model import Commit, BranchInfo
 
 
+# ── I18n Warning Messages ──────────────────────────────────────────
+
+
+WARNING_MESSAGES = {
+    "en": {
+        "no_update": "{days} days without update",
+        "behind_main": "{count} commits behind main",
+        "merged_not_deleted": "Merged but not deleted",
+        "no_unique_commits": "No unique commits (identical to main)",
+        "long_lived": "Branch alive for {days} days (recommend <{limit} days)",
+    },
+    "zh": {
+        "no_update": "{days}天未更新",
+        "behind_main": "已被main超前{count}个commits",
+        "merged_not_deleted": "已合并但未删除",
+        "no_unique_commits": "无独立提交（与main完全一致）",
+        "long_lived": "分支存活{days}天（建议<{limit}天）",
+    },
+}
+
+
+# Current language setting (set by main() via --lang)
+_current_lang = "en"
+
+
+def set_language(lang: str) -> None:
+    """Set the language for warning messages.  ``lang`` must be 'en' or 'zh'."""
+    global _current_lang
+    if lang in WARNING_MESSAGES:
+        _current_lang = lang
+
+
+def _w(key: str, **kwargs) -> str:
+    """Get a warning message in the current language."""
+    msg = WARNING_MESSAGES.get(_current_lang, WARNING_MESSAGES["en"]).get(key, key)
+    if kwargs:
+        msg = msg.format(**kwargs)
+    return msg
+
+
 # ── Branch Type Detection ────────────────────────────────────────────
 
 
@@ -251,15 +291,15 @@ def compute_health(
 
     # Build warnings
     if days_since > 90:
-        warnings.append(f"{days_since}天未更新")
+        warnings.append(_w("no_update", days=days_since))
     if behind > 100:
-        warnings.append(f"已被main超前{behind}个commits")
+        warnings.append(_w("behind_main", count=str(behind)))
     if is_merged and branch_type != "main":
-        warnings.append("已合并但未删除")
+        warnings.append(_w("merged_not_deleted"))
     if unique_count == 0 and branch_type not in ("main", "develop"):
-        warnings.append("无独立提交（与main完全一致）")
+        warnings.append(_w("no_unique_commits"))
     if lifetime_days > 120 and branch_type in ("feature", "hotfix"):
-        warnings.append(f"分支存活{lifetime_days}天（建议<60天）")
+        warnings.append(_w("long_lived", days=str(lifetime_days), limit="60"))
 
     # Determine status
     if branch_type in ("main", "develop"):

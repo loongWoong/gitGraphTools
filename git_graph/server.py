@@ -1,6 +1,7 @@
 """Lightweight HTTP server for the git graph dashboard.
 
-Provides on-demand API endpoints for commit file lists and diffs.
+Provides on-demand API endpoints for commit file lists and diffs,
+plus optional MCP and SSE support.
 Started via ``git_graph.py --serve``.
 """
 
@@ -8,6 +9,7 @@ from __future__ import annotations
 
 import json
 import os
+import time
 import urllib.parse
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
@@ -20,6 +22,8 @@ class GitGraphHandler(BaseHTTPRequestHandler):
     # Set by the caller before starting the server
     dashboard_html: str = ""
     repo_path: str = ""
+    mcp_handler: object | None = None  # MCPHandler instance
+    enable_watch: bool = False
 
     def log_message(self, format, *args):
         """Suppress default stderr logging — use a cleaner format."""
@@ -82,6 +86,11 @@ class GitGraphHandler(BaseHTTPRequestHandler):
                 self._send_error_json(str(e), 500)
             return
 
+        # ── API: SSE watch (live updates) ──
+        if path == "/api/watch" and self.enable_watch:
+            self._handle_sse_watch()
+            return
+
         # ── 404 ──
         self._send_error_json("Not found", 404)
 
@@ -89,9 +98,76 @@ class GitGraphHandler(BaseHTTPRequestHandler):
         """Handle CORS preflight."""
         self.send_response(204)
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
+
+    def do_POST(self):
+        """Handle POST requests (MCP)."""
+        parsed = urllib.parse.urlparse(self.path)
+        path = parsed.path.rstrip("/")
+
+        if path == "/mcp" and self.mcp_handler is not None:
+            content_length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_length)
+            try:
+                response = self.mcp_handler.handle_request(body)
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.send_header("Content-Length", len(response))
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(response)
+            except Exception as e:
+                self._send_error_json(str(e), 500)
+            return
+
+        self._send_error_json("Not found", 404)
+
+    def _handle_sse_watch(self):
+        """SSE endpoint that pushes updates when git refs change."""
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream")
+        self.send_header("Cache-Control", "no-cache")
+        self.send_header("Connection", "keep-alive")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
+
+        refs_dir = os.path.join(self.repo_path, ".git", "refs", "heads")
+        last_mtime = 0
+
+        try:
+            if os.path.exists(refs_dir):
+                last_mtime = _get_refs_mtime(refs_dir)
+
+            # Send initial connection event
+            self.wfile.write(b"data: {\"type\": \"connected\"}\n\n")
+            self.wfile.flush()
+
+            while True:
+                time.sleep(1)
+                if os.path.exists(refs_dir):
+                    current_mtime = _get_refs_mtime(refs_dir)
+                    if current_mtime > last_mtime:
+                        last_mtime = current_mtime
+                        self.wfile.write(b"data: {\"type\": \"refs_changed\"}\n\n")
+                        self.wfile.flush()
+        except (BrokenPipeError, ConnectionResetError, OSError):
+            pass  # Client disconnected
+
+
+def _get_refs_mtime(refs_dir: str) -> float:
+    """Get the most recent modification time of any file under refs_dir."""
+    max_mtime = 0
+    for root, dirs, files in os.walk(refs_dir):
+        for f in files:
+            try:
+                mtime = os.path.getmtime(os.path.join(root, f))
+                if mtime > max_mtime:
+                    max_mtime = mtime
+            except OSError:
+                pass
+    return max_mtime
 
 
 def start_server(
@@ -99,6 +175,9 @@ def start_server(
     repo_path: str,
     port: int = 8765,
     open_browser: bool = True,
+    enable_mcp: bool = False,
+    enable_watch: bool = False,
+    graph_data: dict | None = None,
 ) -> None:
     """Start the HTTP server and block until interrupted.
 
@@ -119,6 +198,20 @@ def start_server(
 
     GitGraphHandler.dashboard_html = html_with_flag
     GitGraphHandler.repo_path = os.path.abspath(repo_path)
+    GitGraphHandler.enable_watch = enable_watch
+
+    if enable_mcp and graph_data:
+        from .mcp_server import MCPHandler
+        GitGraphHandler.mcp_handler = MCPHandler(
+            repo_path=os.path.abspath(repo_path),
+            commits=graph_data.get("commits", []),
+            branches=graph_data.get("branches", []),
+            health=graph_data.get("health", []),
+            author_stats=graph_data.get("author_stats", []),
+            graph_data=graph_data,
+        )
+    else:
+        GitGraphHandler.mcp_handler = None
 
     server = HTTPServer(("127.0.0.1", port), GitGraphHandler)
     url = f"http://127.0.0.1:{port}"

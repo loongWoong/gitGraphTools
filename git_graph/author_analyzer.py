@@ -88,6 +88,8 @@ def compute_bus_factor(
     file_author_data: dict[str, dict[str, int]],
     total_commits: int,
     top_n: int = 10,
+    threshold_pct: float = 80.0,
+    min_commits: int = 5,
 ) -> list[dict]:
     """Compute bus factor warnings from file-level author statistics.
 
@@ -105,7 +107,7 @@ def compute_bus_factor(
 
     for file_path, author_counts in file_author_data.items():
         total_file = sum(author_counts.values())
-        if total_file < 5:
+        if total_file < min_commits:
             continue  # skip files with too few commits for meaningful analysis
 
         authors = sorted(author_counts.items(), key=lambda x: -x[1])
@@ -113,7 +115,7 @@ def compute_bus_factor(
 
         pct = round(dominant[1] / total_file * 100, 1)
 
-        if pct >= 80 and len(authors) >= 1:
+        if pct >= threshold_pct and len(authors) >= 1:
             warnings.append({
                 "fp": file_path,
                 "da": dominant[0],          # dominant author

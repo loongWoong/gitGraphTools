@@ -298,3 +298,26 @@ def get_commit_diff(
 
     output = _run_git(args, repo_path, allow_failure=True)
     return output
+
+
+def get_file_change_frequency(repo_path: str) -> dict[str, int]:
+    """Get per-file change frequency from git history.
+
+    Uses ``git log --all --format='' --name-only``.
+
+    Returns:
+        {file_path: change_count}
+    """
+    output = _run_git(
+        ["log", "--all", "--format=", "--name-only"],
+        repo_path,
+        allow_failure=True,
+    )
+
+    file_counts: dict[str, int] = {}
+    for line in output.strip().split("\n"):
+        path = line.strip()
+        if path:
+            file_counts[path] = file_counts.get(path, 0) + 1
+
+    return file_counts

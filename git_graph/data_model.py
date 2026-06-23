@@ -72,6 +72,21 @@ class GraphData:
     status_counts: dict = field(default_factory=dict)
     timeline: dict = field(default_factory=dict)    # fork/merge relationship data
 
+    # ── Phase 1-4: New intelligence data ────────────────
+    issue_links: dict = field(default_factory=dict)     # issue key → branch mapping
+    sprints: list[dict] = field(default_factory=list)    # sprint analysis data
+    burndown: dict = field(default_factory=dict)         # burndown chart data
+    pulse: dict = field(default_factory=dict)            # pulse metrics
+    dora: dict = field(default_factory=dict)             # DORA metrics
+    pr_metrics: dict = field(default_factory=dict)       # PR analysis data
+    churn: dict = field(default_factory=dict)            # code churn heatmap
+    conflict_risks: list[dict] = field(default_factory=list)  # merge conflict predictions
+    branch_summaries: dict = field(default_factory=dict)      # branch summary texts
+    release_notes: str = ""                                   # auto-generated release notes
+    dependency_graph: dict = field(default_factory=dict)      # branch dependency tree
+    cleanup_suggestions: list[dict] = field(default_factory=list)  # safe delete suggestions
+    multi_repo: list[dict] = field(default_factory=list)     # multi-repo comparison
+
 
 # ── Parsing Functions ────────────────────────────────────────────────
 
