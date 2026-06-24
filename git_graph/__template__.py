@@ -1,6 +1,6 @@
 """HTML template for the git repository intelligence dashboard.
 
-5-tab layout: Overview | Graph | Timeline | Authors | AI Insights
+3-tab layout: Overview | Graph | Insights
 GitHub Dark color scheme, Inter + JetBrains Mono fonts.
 The ``{{GRAPH_DATA}}`` placeholder is replaced at build time.
 """
@@ -108,6 +108,41 @@ body {
 .tab-content { display: none; flex: 1; overflow: auto; }
 .tab-content.active { display: flex; flex-direction: column; }
 
+/* ── Sub-Navigation Pills ──────────────────────────────────────── */
+.sub-nav {
+  display: flex; gap: 4px; padding: 8px 16px;
+  background: var(--bg-secondary); border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sub-nav-btn {
+  padding: 4px 12px; border-radius: 14px;
+  border: 1px solid var(--border); background: none;
+  color: var(--text-secondary); font-size: 12px; cursor: pointer;
+  font-family: var(--font-body); white-space: nowrap;
+}
+.sub-nav-btn:hover { color: var(--text-primary); border-color: var(--text-secondary); }
+.sub-nav-btn.active { background: var(--text-link); border-color: var(--text-link); color: #fff; }
+
+/* ── Insights Sidebar ──────────────────────────────────────────── */
+#insights-sidebar {
+  width: 160px; background: var(--bg-secondary);
+  border-right: 1px solid var(--border);
+  overflow-y: auto; flex-shrink: 0; padding: 8px 0;
+}
+.insight-nav-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px; cursor: pointer; font-size: 12px;
+  color: var(--text-secondary); transition: background 0.1s;
+  user-select: none; border-left: 2px solid transparent;
+}
+.insight-nav-item:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+.insight-nav-item.active {
+  background: rgba(88,166,255,0.08); color: var(--text-link);
+  border-left-color: var(--text-link);
+}
+.insight-panel { display: none; flex: 1; overflow-y: auto; }
+.insight-panel.active { display: block; }
+
 /* ── Overview Tab ──────────────────────────────────────────────── */
 #overview-tab { padding: 24px; gap: 20px; }
 
@@ -190,7 +225,7 @@ body {
   font-size: 12px;
 }
 .quick-actions .action-item:last-child { border-bottom: none; }
-.quick-actions .action-dot {
+.action-dot {
   width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
 }
 .action-dot.healthy { background: var(--healthy); }
@@ -217,6 +252,107 @@ body {
 .dot.zombie_merged { background: var(--zombie-merged); }
 .dot.zombie_abandoned { background: var(--zombie-abandoned); }
 .dot.merged_stale { background: var(--merged-stale); }
+
+/* ── DORA Cards (Overview) ─────────────────────────────────────── */
+.dora-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.dora-metric-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 16px;
+  text-align: center;
+  position: relative;
+}
+.dora-metric-card .dmc-value {
+  font-size: 30px; font-weight: 700;
+  font-family: var(--font-mono); color: var(--text-link);
+}
+.dora-metric-card .dmc-label {
+  font-size: 11px; color: var(--text-secondary);
+  text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px;
+}
+.dora-metric-card .dmc-sub {
+  font-size: 11px; color: var(--text-secondary); margin-top: 4px;
+}
+.dmc-tier {
+  display: inline-block; padding: 2px 8px; border-radius: 10px;
+  font-size: 10px; font-weight: 600; margin-top: 6px; text-transform: uppercase;
+}
+.dmc-tier.elite { background: rgba(35,134,54,0.15); color: var(--healthy); }
+.dmc-tier.high { background: rgba(88,166,255,0.15); color: var(--text-link); }
+.dmc-tier.medium { background: rgba(210,153,34,0.15); color: var(--aging); }
+.dmc-tier.low { background: rgba(248,81,73,0.15); color: var(--zombie-abandoned); }
+.dmc-confidence {
+  font-size: 9px; color: var(--text-secondary); margin-top: 4px;
+  opacity: 0.7;
+}
+
+/* ── Delivery Pipeline (Overview) ──────────────────────────────── */
+.delivery-pipeline {
+  display: flex; gap: 0; padding: 8px 16px;
+  border-radius: var(--radius); overflow: hidden;
+}
+.pipeline-stage {
+  flex: 1; text-align: center; padding: 16px 12px;
+  cursor: pointer; transition: background 0.15s; position: relative;
+  border-right: 1px solid var(--border);
+}
+.pipeline-stage:last-child { border-right: none; }
+.pipeline-stage:hover { background: var(--bg-tertiary); }
+.pipeline-stage .ps-count { font-size: 28px; font-weight: 700; }
+.pipeline-stage .ps-label { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+.pipeline-stage .ps-arrow {
+  position: absolute; right: -10px; top: 50%; transform: translateY(-50%);
+  font-size: 14px; color: var(--text-secondary); z-index: 1; pointer-events: none;
+}
+/* Pipeline stage expanded list */
+.pipeline-detail {
+  padding: 0 16px 16px;
+  display: none;
+}
+.pipeline-detail.open { display: block; }
+.pipeline-detail .pd-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 10px; font-size: 12px; border-radius: 4px;
+  cursor: pointer;
+}
+.pipeline-detail .pd-item:hover { background: var(--bg-tertiary); }
+.pipeline-detail .pd-name { font-family: var(--font-mono); font-size: 11px; flex: 1; }
+.pipeline-detail .pd-meta { font-size: 10px; color: var(--text-secondary); }
+
+/* ── Pulse Grid (Overview) ─────────────────────────────────────── */
+.pulse-week-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+}
+.pulse-week-cell {
+  background: var(--bg-tertiary); border-radius: var(--radius);
+  padding: 14px; text-align: center;
+}
+.pulse-week-cell .pw-date { font-size: 10px; color: var(--text-secondary); margin-bottom: 4px; }
+.pulse-week-cell .pw-commits { font-size: 22px; font-weight: 700; color: var(--text-primary); }
+.pulse-week-cell .pw-meta { font-size: 10px; color: var(--text-secondary); margin-top: 2px; }
+
+/* ── DORA Details Panel (Overview expandable) ──────────────────── */
+#dora-details { display: none; }
+#dora-details.open { display: contents; }
+.lead-time-histogram { display: flex; align-items: flex-end; gap: 2px; padding: 12px 16px 0; height: 140px; }
+.hist-bar { flex: 1; border-radius: 3px 3px 0 0; min-width: 3px; transition: opacity 0.15s; }
+.hist-bar:hover { opacity: 1 !important; }
+.hist-labels { display: flex; justify-content: space-between; padding: 4px 16px 8px; font-size: 9px; color: var(--text-secondary); }
+.pr-merge-bars { display: flex; gap: 24px; padding: 16px; align-items: flex-end; height: 140px; }
+.pr-merge-bar-wrap { flex: 1; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
+.pr-merge-bar { width: 100%; max-width: 60px; border-radius: 4px 4px 0 0; transition: height 0.5s ease; }
+.pr-merge-bar.merge { background: var(--healthy); }
+.pr-merge-bar.squash { background: var(--text-link); }
+.pr-merge-bar.rebase { background: var(--aging); }
+.pr-merge-value { font-size: 16px; font-weight: 600; color: var(--text-primary); margin-top: 4px; }
+.pr-merge-label { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
 
 /* ── Graph Tab ─────────────────────────────────────────────────── */
 #graph-tab { flex-direction: row; }
@@ -387,8 +523,8 @@ body {
 .tt-branch-tag.zombie_abandoned .dot { background: var(--zombie-abandoned); }
 .tt-branch-tag.merged_stale     .dot { background: var(--merged-stale); }
 
-/* ── Timeline Tab ──────────────────────────────────────────────── */
-#timeline-tab { padding: 24px; gap: 24px; }
+/* ── Timeline (in Graph sub-view) ───────────────────────────────── */
+.timeline-wrap { padding: 24px; gap: 24px; }
 
 .heatmap-grid {
   display: flex;
@@ -450,9 +586,7 @@ body {
 .lifetime-row .lbar.merged_stale { background: var(--merged-stale); opacity: 0.5; }
 .lifetime-row .ldur { width: 50px; font-size: 10px; color: var(--text-secondary); flex-shrink: 0; }
 
-/* ── Authors Tab ───────────────────────────────────────────────── */
-#authors-tab { padding: 24px; gap: 24px; }
-
+/* ── Author Bars ───────────────────────────────────────────────── */
 .author-bar-row {
   display: flex;
   align-items: center;
@@ -477,15 +611,6 @@ body {
 .bf-warning .bf-icon { color: var(--aging); font-weight: bold; flex-shrink: 0; }
 .bf-warning .bf-file { font-family: var(--font-mono); font-size: 10px; color: var(--text-secondary); word-break: break-all; }
 .bf-warning .bf-detail { color: var(--text-secondary); font-size: 11px; }
-
-/* ── AI Tab ────────────────────────────────────────────────────── */
-#ai-tab { padding: 24px; align-items: center; justify-content: center; }
-#ai-tab .placeholder {
-  text-align: center;
-  color: var(--text-secondary);
-}
-#ai-tab .placeholder h2 { font-size: 18px; color: var(--text-primary); margin-bottom: 8px; }
-#ai-tab .placeholder p { font-size: 13px; }
 
 /* ── Search / Controls ─────────────────────────────────────────── */
 #graph-controls {
@@ -547,6 +672,7 @@ body {
 #tooltip .tt-hash { color: var(--text-secondary); font-size: 10px; font-family: var(--font-mono); }
 #tooltip .tt-subject { color: var(--text-primary); margin-top: 2px; }
 #tooltip .tt-meta { color: var(--text-secondary); font-size: 10px; margin-top: 4px; }
+
 /* ── Diff Viewer ───────────────────────────────────────────────── */
 .diff-viewer {
   margin-top: 10px;
@@ -620,102 +746,7 @@ body {
   color: var(--text-secondary);
 }
 
-/* ── P1: Pulse Banner ─────────────────────────────────────── */
-.pulse-banner {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 12px;
-  padding: 16px 20px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  margin-bottom: 16px;
-}
-.pulse-card { text-align: center; }
-.pulse-card .pvalue { font-size: 28px; font-weight: 700; color: var(--text-primary); }
-.pulse-card .plabel { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
-.pulse-card .ptrend { font-size: 12px; margin-top: 2px; }
-.trend-up { color: var(--healthy); }
-.trend-down { color: var(--zombie-abandoned); }
-.trend-flat { color: var(--text-secondary); }
-
-/* ── P1: Kanban Board ─────────────────────────────────────── */
-.kanban-board { display: flex; gap: 16px; padding: 16px; overflow-x: auto; flex: 1; }
-.kanban-column {
-  flex: 0 0 280px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  display: flex; flex-direction: column;
-  max-height: calc(100vh - 140px);
-}
-.kanban-column-header {
-  padding: 12px 16px;
-  font-weight: 600; font-size: 13px;
-  color: var(--text-primary);
-  border-bottom: 1px solid var(--border);
-  display: flex; justify-content: space-between; align-items: center;
-}
-.kanban-column-header .count {
-  font-size: 11px; color: var(--text-secondary);
-  background: var(--bg-tertiary); border-radius: 10px; padding: 1px 8px;
-}
-.kanban-column-body { flex: 1; overflow-y: auto; padding: 8px; }
-.kanban-card {
-  background: var(--bg-primary);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 10px 12px;
-  margin-bottom: 8px;
-  cursor: pointer;
-  transition: border-color 0.15s;
-}
-.kanban-card:hover { border-color: var(--text-link); }
-.kanban-card .kc-branch { font-size: 13px; font-weight: 600; color: var(--text-link); font-family: var(--font-mono); }
-.kanban-card .kc-issue { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
-.kanban-card .kc-meta { font-size: 11px; color: var(--text-secondary); margin-top: 4px; display: flex; gap: 8px; align-items: center; }
-
-/* ── P1: Sprint Table ─────────────────────────────────────── */
-.sprint-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-.sprint-table th, .sprint-table td {
-  padding: 8px 12px; text-align: left;
-  border-bottom: 1px solid var(--border);
-}
-.sprint-table th { color: var(--text-secondary); font-weight: 500; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; }
-.sprint-table td { color: var(--text-primary); }
-.burndown-chart { width: 100%; height: 160px; margin-top: 12px; }
-
-/* ── P2: DORA Grid ────────────────────────────────────────── */
-.dora-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px; padding: 16px;
-}
-.dora-card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px;
-  text-align: center;
-}
-.dora-card .dmvalue { font-size: 36px; font-weight: 700; color: var(--text-link); }
-.dora-card .dmlabel { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
-.dora-card .dmsub { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
-.lead-time-chart { width: 100%; height: 200px; margin: 16px 0; }
-.churn-treemap { padding: 16px; }
-.churn-item {
-  display: flex; align-items: center; padding: 6px 10px;
-  border-radius: 4px; margin-bottom: 3px; font-size: 12px;
-}
-.churn-item .chname { flex: 1; font-family: var(--font-mono); font-size: 11px; }
-.churn-item .chcount { font-size: 11px; color: var(--text-secondary); margin-left: 12px; }
-.hotspot-badge {
-  display: inline-block; padding: 1px 6px; border-radius: 3px;
-  background: #f8514933; color: var(--zombie-abandoned); font-size: 10px; font-weight: 600;
-  margin-left: 6px;
-}
-
-/* ── P3: Conflict Alerts ──────────────────────────────────── */
+/* ── Conflict Alerts ──────────────────────────────────── */
 .conflict-alert {
   background: var(--bg-secondary);
   border: 1px solid var(--border);
@@ -752,19 +783,42 @@ body {
   font-size: 13px; color: var(--text-primary);
 }
 
-/* ── P4: Dependency Graph ─────────────────────────────────── */
-.dep-graph-container { flex: 1; overflow: auto; position: relative; }
-.dep-node {
+/* ── Topology Graph ─────────────────────────────────── */
+.topo-container { flex: 1; overflow: auto; position: relative; padding: 24px; }
+#topo-svg { min-width: 100%; min-height: 100%; }
+.topo-node {
   cursor: pointer; transition: opacity 0.2s;
-  fill: var(--bg-secondary); stroke: var(--border); stroke-width: 2;
+  stroke-width: 2;
 }
-.dep-node:hover { stroke: var(--text-link); stroke-width: 3; }
-.dep-node.main { fill: #58a6ff22; stroke: var(--text-link); }
-.dep-label { font-size: 11px; font-family: var(--font-mono); fill: var(--text-primary); pointer-events: none; }
-.dep-edge { stroke: var(--border); stroke-width: 1.5; fill: none; marker-end: url(#arrowhead); }
-#dep-graph-svg { min-width: 100%; min-height: 100%; }
+.topo-node:hover { stroke-width: 3; }
+.topo-node.healthy { fill: rgba(35,134,54,0.1); stroke: var(--healthy); }
+.topo-node.aging { fill: rgba(210,153,34,0.1); stroke: var(--aging); }
+.topo-node.zombie_merged { fill: rgba(137,87,229,0.1); stroke: var(--zombie-merged); }
+.topo-node.zombie_abandoned { fill: rgba(248,81,73,0.1); stroke: var(--zombie-abandoned); }
+.topo-node.merged_stale { fill: rgba(110,118,129,0.1); stroke: var(--merged-stale); }
+.topo-node.main-branch { fill: rgba(88,166,255,0.15); stroke: var(--text-link); stroke-width: 2.5; }
+.topo-node.faded { opacity: 0.25; }
+.topo-edge { stroke: var(--border); stroke-width: 1.5; fill: none; marker-end: url(#topo-arrow); }
+.topo-edge.highlight { stroke: var(--text-link); stroke-width: 2.5; }
+.topo-edge.faded { opacity: 0.15; }
+.topo-label { font-size: 10px; font-family: var(--font-mono); fill: var(--text-primary); pointer-events: none; }
+.topo-info {
+  font-size: 11px; color: var(--text-secondary); padding: 6px 14px;
+  border-top: 1px solid var(--border); min-height: 28px;
+}
+.topo-info strong { color: var(--text-primary); }
 
-/* ── P4: Cleanup List ─────────────────────────────────────── */
+/* ── Cleanup List ─────────────────────────────────────── */
+.cleanup-category { margin-bottom: 12px; }
+.cleanup-category .cc-header {
+  font-size: 10px; font-weight: 600; color: var(--text-secondary);
+  text-transform: uppercase; letter-spacing: 0.5px; padding: 6px 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.cc-count {
+  font-size: 10px; color: var(--text-secondary);
+  background: var(--bg-tertiary); padding: 1px 6px; border-radius: 8px;
+}
 .cleanup-row {
   display: flex; align-items: center; padding: 8px 12px;
   border-bottom: 1px solid var(--border); gap: 12px;
@@ -788,7 +842,7 @@ body {
   border-radius: var(--radius); font-size: 12px; cursor: pointer; font-weight: 500;
 }
 
-/* ── P4: Command Palette ──────────────────────────────────── */
+/* ── Command Palette ──────────────────────────────────── */
 .palette-overlay {
   display: none; position: fixed; inset: 0;
   background: #00000099; z-index: 9999;
@@ -821,7 +875,7 @@ body {
 .palette-result.selected { background: var(--bg-tertiary); }
 .palette-result .pr-shortcut { font-size: 10px; color: var(--text-secondary); }
 
-/* ── P4: Keyboard Shortcuts Modal ─────────────────────────── */
+/* ── Keyboard Shortcuts Modal ─────────────────────────── */
 .shortcuts-modal {
   display: none; position: fixed; inset: 0;
   background: #00000099; z-index: 10000;
@@ -842,14 +896,14 @@ body {
   color: var(--text-link); font-weight: 500; width: 140px;
 }
 
-/* ── P4: Live Reload Notification ─────────────────────────── */
+/* ── Live Reload Notification ─────────────────────────── */
 #live-notify {
   display: none; position: fixed; top: 0; left: 0; right: 0;
   background: var(--text-link); color: #fff; text-align: center;
   padding: 8px; font-size: 12px; cursor: pointer; z-index: 9998;
 }
 
-/* ── P5: Multi-Repo Compare ───────────────────────────────── */
+/* ── Multi-Repo Compare ───────────────────────────────── */
 .compare-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -865,6 +919,20 @@ body {
 .compare-card .cm-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 12px; }
 .compare-card .cm-row .cmlabel { color: var(--text-secondary); }
 .compare-card .cm-row .cmvalue { color: var(--text-primary); }
+
+/* ── Risk banner ───────────────────────────────────────── */
+.risk-banner {
+  padding: 10px 16px; margin-bottom: 0;
+  border-radius: var(--radius);
+}
+.risk-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px 8px; font-size: 11px; border-radius: 4px; margin-bottom: 2px;
+}
+.risk-item.high { background: rgba(248,81,73,0.08); }
+.risk-item.medium { background: rgba(210,153,34,0.06); }
+.risk-item.low { background: rgba(88,166,255,0.04); }
+.risk-sev { font-size: 12px; flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -873,93 +941,165 @@ body {
 <div id="tab-nav">
   <button class="tab-btn active" data-tab="overview">Overview</button>
   <button class="tab-btn" data-tab="graph">Graph</button>
-  <button class="tab-btn" data-tab="timeline">Timeline</button>
-  <button class="tab-btn" data-tab="authors">Authors</button>
-  <button class="tab-btn" data-tab="ai">AI Insights</button>
-  <button class="tab-btn" data-tab="board">Board</button>
-  <button class="tab-btn" data-tab="dora">DORA+</button>
-  <button class="tab-btn" data-tab="deps">Dependencies</button>
+  <button class="tab-btn" data-tab="insights">Insights</button>
   <button class="tab-btn" id="compare-tab-btn" style="display:none" data-tab="compare">Compare</button>
   <span style="flex:1"></span>
   <button id="theme-toggle" title="Toggle light/dark theme" style="background:none;border:1px solid var(--border);color:var(--text-secondary);cursor:pointer;padding:4px 10px;border-radius:var(--radius);font-size:14px;">&#x263C;</button>
 </div>
 
-<!-- ── Overview Tab ────────────────────────────────────────────── -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- TAB 1: Overview                                                 -->
+<!-- ══════════════════════════════════════════════════════════════ -->
 <div class="tab-content active" id="overview-tab">
-  <div class="metric-cards" id="metric-cards"></div>
+
+  <!-- Repo Health + Quick Actions row -->
   <div class="overview-row">
     <div class="health-gauge" id="health-gauge"></div>
     <div class="section-card quick-actions" id="quick-actions"></div>
   </div>
-  <div class="overview-row">
-    <div class="section-card" id="top-branches"></div>
-    <div class="section-card" id="needs-attention"></div>
+
+  <!-- DORA Metrics row -->
+  <div class="section-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <h3 style="margin-bottom:0">Delivery Performance (DORA)</h3>
+      <button id="dora-details-toggle" class="nl-btn" style="padding:4px 12px;font-size:11px;background:var(--bg-tertiary);color:var(--text-secondary);border:1px solid var(--border);">
+        View Details
+      </button>
+    </div>
+    <div class="dora-row" id="dora-metrics" style="margin-top:12px;"></div>
+    <div id="dora-details" style="margin-top:12px;border-top:1px solid var(--border);padding-top:16px;">
+      <div class="overview-row">
+        <div class="section-card"><h3>Lead Time Distribution</h3><div class="lead-time-histogram" id="lt-histogram"></div><div class="hist-labels" id="lt-hist-labels"></div></div>
+        <div class="section-card"><h3>PR Merge Methods</h3><div class="pr-merge-bars" id="pr-merge-chart"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity Pulse -->
+  <div class="section-card">
+    <h3>Activity Pulse</h3>
+    <div class="pulse-week-grid" id="pulse-week-grid"></div>
+  </div>
+
+  <!-- Branch Delivery Pipeline -->
+  <div class="section-card">
+    <h3>Branch Delivery Pipeline</h3>
+    <div class="delivery-pipeline" id="delivery-pipeline"></div>
+    <div class="pipeline-detail" id="pipeline-detail"></div>
+  </div>
+
+  <!-- Risk Warnings row -->
+  <div class="section-card" id="risk-section" style="display:none;">
+    <h3>Risk Branches</h3>
+    <div id="risk-banner"></div>
   </div>
 </div>
 
-<!-- ── Graph Tab ───────────────────────────────────────────────── -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- TAB 2: Graph (with sub-views: DAG / Timeline / Lifecycle)      -->
+<!-- ══════════════════════════════════════════════════════════════ -->
 <div class="tab-content" id="graph-tab">
-  <div id="graph-legend">
-    <div class="legend-title">Branches</div>
-    <div id="legend-list"></div>
+  <!-- Sub-navigation -->
+  <div class="sub-nav" id="graph-sub-nav" style="display:none;">
+    <button class="sub-nav-btn active" data-sub="dag">DAG</button>
+    <button class="sub-nav-btn" data-sub="timeline">Timeline</button>
+    <button class="sub-nav-btn" data-sub="lifecycle">Lifecycle</button>
   </div>
-  <div style="display:flex;flex-direction:column;flex:1;">
-    <div id="graph-controls">
-      <input type="text" id="graph-search" placeholder="Search commits..." />
-      <span class="match-count" id="match-count"></span>
+
+  <!-- DAG sub-view -->
+  <div class="graph-sub" id="graph-sub-dag" style="display:flex;flex-direction:row;flex:1;">
+    <div id="graph-legend">
+      <div class="legend-title">Branches</div>
+      <div id="legend-list"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;flex:1;">
+      <div id="graph-controls">
+        <input type="text" id="graph-search" placeholder="Search commits..." />
+        <span class="match-count" id="match-count"></span>
+        <span style="flex:1"></span>
+        <button id="btn-fit">Fit</button>
+        <button id="btn-reset">Reset</button>
+        <span style="color:var(--text-secondary)">| +/- zoom  |  drag pan  |  Esc clear</span>
+      </div>
+      <div id="graph-container">
+        <svg id="graph-svg"></svg>
+        <div id="minimap"><svg id="minimap-svg"></svg></div>
+      </div>
+    </div>
+    <div id="detail-panel">
+      <div class="panel-header">
+        <h3>Commit Detail</h3>
+        <button class="panel-close" id="panel-close">&times;</button>
+      </div>
+      <div class="panel-body" id="panel-body"></div>
+    </div>
+  </div>
+
+  <!-- Timeline sub-view -->
+  <div class="graph-sub" id="graph-sub-timeline" style="display:none;flex:1;overflow:auto;flex-direction:column;">
+    <div class="section-card" style="flex:1;display:flex;flex-direction:column;min-height:0;margin:24px 24px 12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <h3>Branch Fork &amp; Merge Timeline</h3>
+        <label style="font-size:11px;color:var(--text-secondary);cursor:pointer">
+          <input type="checkbox" id="tl-merged-toggle" checked onchange="renderTimeline()"> Show merged
+        </label>
+      </div>
+      <div id="timeline-graph-container" style="flex:1;overflow:auto;position:relative;min-height:0;background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius)"></div>
+    </div>
+    <div class="section-card" style="margin:0 24px 24px;">
+      <h3>Commit Activity Heatmap</h3>
+      <div class="heatmap-grid" id="heatmap-grid"></div>
+      <div class="heatmap-labels" id="heatmap-labels"></div>
+    </div>
+  </div>
+
+  <!-- Lifecycle sub-view -->
+  <div class="graph-sub" id="graph-sub-lifecycle" style="display:none;flex:1;overflow:auto;padding:24px;">
+    <div class="section-card">
+      <h3>Branch Lifetime Overview</h3>
+      <div class="lifetime-bars" id="lifetime-bars"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- TAB 3: Insights (sidebar + panels)                              -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="tab-content" id="insights-tab" style="flex-direction:row;">
+  <div id="insights-sidebar">
+    <div class="insight-nav-item active" data-insight="authors">&#x1F464; Authors</div>
+    <div class="insight-nav-item" data-insight="topology">&#x1F310; Topology</div>
+    <div class="insight-nav-item" data-insight="ai">&#x1F4A1; AI Analysis</div>
+    <div class="insight-nav-item" data-insight="cleanup">&#x1F9F9; Cleanup</div>
+  </div>
+
+  <!-- Authors panel -->
+  <div class="insight-panel active" id="insight-authors" style="padding:24px;">
+    <div class="section-card">
+      <h3>Author Contributions</h3>
+      <div id="author-bars"></div>
+    </div>
+    <div class="section-card" style="margin-top:16px;">
+      <h3>Bus Factor Warnings</h3>
+      <div id="bus-factor-list"></div>
+    </div>
+  </div>
+
+  <!-- Topology panel -->
+  <div class="insight-panel" id="insight-topology" style="display:flex;flex-direction:column;">
+    <div class="sub-nav" style="border-bottom:1px solid var(--border);">
+      <input type="text" id="topo-search" placeholder="Filter branches..." style="background:var(--bg-primary);border:1px solid var(--border);color:var(--text-primary);padding:4px 10px;border-radius:var(--radius);font-size:11px;width:180px;outline:none;" oninput="filterTopo()">
       <span style="flex:1"></span>
-      <button id="btn-fit">Fit</button>
-      <button id="btn-reset">Reset</button>
-      <span style="color:var(--text-secondary)">| +/- zoom  |  drag pan  |  Esc clear</span>
+      <span style="font-size:11px;color:var(--text-secondary);">Click node to go to Graph &middot; Hover to explore</span>
     </div>
-    <div id="graph-container">
-      <svg id="graph-svg"></svg>
-      <div id="minimap"><svg id="minimap-svg"></svg></div>
+    <div class="topo-container" id="topo-container">
+      <svg id="topo-svg"></svg>
     </div>
+    <div class="topo-info" id="topo-info">Hover over a branch node to see its relationships.</div>
   </div>
-  <div id="detail-panel">
-    <div class="panel-header">
-      <h3>Commit Detail</h3>
-      <button class="panel-close" id="panel-close">&times;</button>
-    </div>
-    <div class="panel-body" id="panel-body"></div>
-  </div>
-</div>
 
-<!-- ── Timeline Tab ────────────────────────────────────────────── -->
-<div class="tab-content" id="timeline-tab">
-  <div class="section-card" style="flex:1;display:flex;flex-direction:column;min-height:0">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <h3>Branch Fork &amp; Merge Timeline</h3>
-      <label style="font-size:11px;color:var(--text-secondary);cursor:pointer">
-        <input type="checkbox" id="tl-merged-toggle" checked onchange="renderTimeline()"> Show merged
-      </label>
-    </div>
-    <div id="timeline-graph-container" style="flex:1;overflow:auto;position:relative;min-height:0;background:var(--bg-primary);border:1px solid var(--border);border-radius:var(--radius)"></div>
-  </div>
-  <div class="section-card">
-    <h3>Commit Activity Heatmap</h3>
-    <div class="heatmap-grid" id="heatmap-grid"></div>
-    <div class="heatmap-labels" id="heatmap-labels"></div>
-  </div>
-</div>
-
-<!-- ── Authors Tab ─────────────────────────────────────────────── -->
-<div class="tab-content" id="authors-tab">
-  <div class="section-card">
-    <h3>Author Contributions</h3>
-    <div id="author-bars"></div>
-  </div>
-  <div class="section-card">
-    <h3>Bus Factor Warnings</h3>
-    <div id="bus-factor-list"></div>
-  </div>
-</div>
-
-<!-- ── AI Insights Tab ─────────────────────────────────────────── -->
-<div class="tab-content" id="ai-tab">
-  <div style="padding:24px;flex:1;overflow-y:auto;">
-    <!-- Natural Language Query -->
+  <!-- AI Analysis panel -->
+  <div class="insight-panel" id="insight-ai" style="padding:24px;">
     <div class="section-card">
       <h3>Ask About Your Repository</h3>
       <div class="nl-query-box">
@@ -968,55 +1108,25 @@ body {
       </div>
       <div id="nl-results" class="nl-results"></div>
     </div>
-
-    <!-- Conflict Risks -->
     <div class="section-card" style="margin-top:16px">
       <h3>Merge Conflict Risks</h3>
       <div id="conflict-risks"></div>
     </div>
-
-    <!-- Branch Summaries -->
     <div class="section-card" style="margin-top:16px">
       <h3>Branch Summaries</h3>
       <div id="branch-summaries"></div>
     </div>
-
-    <!-- Release Notes -->
     <div class="section-card" style="margin-top:16px">
       <h3>Release Notes Draft</h3>
       <pre id="release-notes" style="font-size:12px;color:var(--text-secondary);white-space:pre-wrap;max-height:300px;overflow-y:auto;padding:12px;background:var(--bg-primary);border-radius:var(--radius);"></pre>
       <button id="copy-rn-btn" class="nl-btn" style="margin-top:8px">Copy Release Notes</button>
     </div>
   </div>
-</div>
 
-<!-- ── Board Tab (Kanban) ───────────────────────────────────── -->
-<div class="tab-content" id="board-tab">
-  <div class="kanban-board" id="kanban-board"></div>
-</div>
-
-<!-- ── DORA+ Tab ────────────────────────────────────────────── -->
-<div class="tab-content" id="dora-tab">
-  <div style="padding:16px;overflow-y:auto;flex:1;">
-    <div class="section-card"><h3>DORA Metrics</h3><div class="dora-grid" id="dora-grid"></div></div>
-    <div class="section-card" style="margin-top:16px"><h3>Lead Time Distribution</h3><svg class="lead-time-chart" id="lead-time-chart"></svg></div>
-    <div class="section-card" style="margin-top:16px"><h3>PR Merge Methods</h3><div id="pr-methods"></div></div>
-    <div class="section-card" style="margin-top:16px"><h3>Code Churn Heatmap</h3><div class="churn-treemap" id="churn-treemap"></div></div>
-  </div>
-</div>
-
-<!-- ── Dependencies Tab ─────────────────────────────────────── -->
-<div class="tab-content" id="deps-tab">
-  <div style="padding:12px;flex:1;overflow:hidden;display:flex;flex-direction:column;">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:0 8px 8px;">
-      <h3 style="font-size:14px;color:var(--text-primary);">Branch Dependency Graph</h3>
-      <span style="font-size:11px;color:var(--text-secondary);">Click node to highlight branch</span>
-    </div>
-    <div class="dep-graph-container" id="dep-graph-container">
-      <svg id="dep-graph-svg"></svg>
-    </div>
-    <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px;">
-      <h3 style="font-size:13px;color:var(--text-primary);padding:0 8px 8px;">Safe Deletion Candidates</h3>
+  <!-- Cleanup panel -->
+  <div class="insight-panel" id="insight-cleanup" style="padding:24px;">
+    <div class="section-card">
+      <h3>Safe Deletion Candidates</h3>
       <div id="cleanup-list"></div>
     </div>
   </div>
@@ -1042,16 +1152,14 @@ body {
   <div class="shortcuts-box">
     <h2>Keyboard Shortcuts</h2>
     <table class="shortcuts-table">
+      <tr><td>1 / 2 / 3</td><td>Switch tabs (1=Overview, 2=Graph, 3=Insights)</td></tr>
       <tr><td>Ctrl+K / Cmd+K</td><td>Open command palette</td></tr>
       <tr><td>Escape</td><td>Close palette / Clear selection</td></tr>
-      <tr><td>1-8</td><td>Switch tabs (1=Overview, 2=Graph, ...)</td></tr>
-      <tr><td>g g</td><td>Go to Graph view</td></tr>
       <tr><td>g o</td><td>Go to Overview</td></tr>
-      <tr><td>g t</td><td>Go to Timeline</td></tr>
-      <tr><td>g a</td><td>Go to Authors</td></tr>
-      <tr><td>g i</td><td>Go to AI Insights</td></tr>
-      <tr><td>g b</td><td>Go to Board</td></tr>
-      <tr><td>g d</td><td>Go to Dependencies</td></tr>
+      <tr><td>g g</td><td>Go to Graph</td></tr>
+      <tr><td>g t</td><td>Go to Timeline (in Graph)</td></tr>
+      <tr><td>g a</td><td>Go to Authors (in Insights)</td></tr>
+      <tr><td>g i</td><td>Go to AI Analysis (in Insights)</td></tr>
       <tr><td>?</td><td>Show this help</td></tr>
       <tr><td>/</td><td>Focus search (Graph view)</td></tr>
       <tr><td>F</td><td>Fit graph to screen</td></tr>
@@ -1085,37 +1193,83 @@ const API_BASE = isServerMode ? `http://127.0.0.1:${window.__SERVER_PORT__||8765
   if (saved === 'light') document.documentElement.dataset.theme = 'light';
 })();
 
-// ── Tab Switching ───────────────────────────────────────────────────
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById(btn.dataset.tab + '-tab').classList.add('active');
-    if (btn.dataset.tab === 'graph') updateMinimap();
-  });
-});
-
-// ── Helper ──────────────────────────────────────────────────────────
+// ── Helpers ──────────────────────────────────────────────────────────
 function escHtml(s) { if (!s) return ''; return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function fmtDate(iso) { if (!iso) return ''; try { return new Date(iso).toLocaleDateString(); } catch { return iso; } }
 function fmtDateShort(iso) { if (!iso) return ''; try { const d=new Date(iso); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); } catch { return iso; } }
 function statusDot(status) { return `<span class="dot ${status}"></span>`; }
+function daysAgo(iso) { if (!iso) return ''; try { const d = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000); return d === 0 ? 'today' : d === 1 ? '1d ago' : d + 'd ago'; } catch { return ''; } }
+
+const healthLookup = {};
+(DATA.health||[]).forEach(h => { healthLookup[h.n] = h; });
 
 // ═══════════════════════════════════════════════════════════════════
-// TAB 1: Overview
+// TAB SWITCHING
 // ═══════════════════════════════════════════════════════════════════
-function renderOverview() {
-  // Metric cards
-  const cards = document.getElementById('metric-cards');
-  const zCount = (DATA.status_counts.zombie_merged || 0) + (DATA.status_counts.zombie_abandoned || 0);
-  cards.innerHTML = [
-    { v: DATA.metadata.total_commits, l: 'Commits' },
-    { v: DATA.metadata.total_branches, l: 'Branches' },
-    { v: DATA.author_stats.length, l: 'Authors' },
-    { v: zCount, l: 'Zombies' },
-  ].map(c => `<div class="metric-card"><div class="value">${c.v}</div><div class="label">${c.l}</div></div>`).join('');
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
 
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  const btn = document.querySelector(`[data-tab="${name}"]`);
+  const tab = document.getElementById(name + '-tab');
+  if (btn) btn.classList.add('active');
+  if (tab) tab.classList.add('active');
+
+  if (name === 'graph') {
+    document.getElementById('graph-sub-nav').style.display = 'flex';
+    switchGraphSub('dag');
+  } else {
+    const subNav = document.getElementById('graph-sub-nav');
+    if (subNav) subNav.style.display = 'none';
+  }
+
+  if (name === 'overview') { renderHealthGauge(); renderDORAOverview(); renderPulseGrid(); renderDeliveryPipeline(); renderRiskBanner(); }
+  if (name === 'insights') switchInsight('authors');
+  if (name === 'compare') renderComparison();
+}
+
+// ── Graph Sub-Navigation ────────────────────────────────────────────
+function switchGraphSub(name) {
+  document.querySelectorAll('#graph-sub-nav .sub-nav-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.querySelector(`#graph-sub-nav [data-sub="${name}"]`);
+  if (btn) btn.classList.add('active');
+  document.querySelectorAll('.graph-sub').forEach(c => c.style.display = 'none');
+  const panel = document.getElementById('graph-sub-' + name);
+  if (panel) panel.style.display = name === 'dag' ? 'flex' : (name === 'timeline' ? 'flex' : 'block');
+  if (name === 'dag') updateMinimap();
+  if (name === 'timeline') renderTimeline();
+  if (name === 'lifecycle') renderLifecycle();
+}
+
+document.querySelectorAll('#graph-sub-nav .sub-nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => switchGraphSub(btn.dataset.sub));
+});
+
+// ── Insights Sidebar ────────────────────────────────────────────────
+function switchInsight(name) {
+  document.querySelectorAll('.insight-nav-item').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.insight-panel').forEach(c => c.classList.remove('active'));
+  const nav = document.querySelector(`.insight-nav-item[data-insight="${name}"]`);
+  const panel = document.getElementById('insight-' + name);
+  if (nav) nav.classList.add('active');
+  if (panel) panel.classList.add('active');
+  if (name === 'authors') renderAuthors();
+  if (name === 'topology') renderTopology();
+  if (name === 'ai') { renderConflictRisks(); renderAISummaries(); }
+  if (name === 'cleanup') renderCleanupSuggestions();
+}
+
+document.querySelectorAll('.insight-nav-item').forEach(item => {
+  item.addEventListener('click', () => switchInsight(item.dataset.insight));
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// OVERVIEW: Health Gauge + Quick Actions
+// ═══════════════════════════════════════════════════════════════════
+function renderHealthGauge() {
   // Health gauge
   const score = DATA.repo_health_score;
   const r = 36, circ = 2 * Math.PI * r;
@@ -1136,6 +1290,9 @@ function renderOverview() {
         ${Object.entries(DATA.status_counts).map(([k,v]) =>
           `${v} ${k.replace(/_/g,' ')}`).join(' &middot; ') || 'No data'}
       </div>
+      <div style="color:var(--text-secondary);font-size:12px;margin-top:2px;">
+        ${DATA.metadata.total_commits} commits &middot; ${DATA.metadata.total_branches} branches &middot; ${DATA.author_stats.length} authors
+      </div>
     </div>`;
 
   // Quick actions
@@ -1143,36 +1300,224 @@ function renderOverview() {
   let qaHtml = '<h3>Quick Actions</h3>';
   const zombies = DATA.health.filter(h => h.st === 'zombie_merged' || h.st === 'zombie_abandoned');
   const stale = DATA.health.filter(h => h.st === 'merged_stale');
-  qaHtml += `<div class="action-item">${statusDot('zombie_merged')} ${zombies.length} zombie branches (safe to delete)</div>`;
-  qaHtml += `<div class="action-item">${statusDot('merged_stale')} ${stale.length} merged-stale branches (can delete)</div>`;
-  qaHtml += `<div class="action-item">${statusDot('zombie_abandoned')} ${DATA.health.filter(h=>h.st==='zombie_abandoned').length} abandoned branches (needs review)</div>`;
+  const aging = DATA.health.filter(h => h.st === 'aging');
+  qaHtml += `<div class="action-item" onclick="switchTab('insights');switchInsight('cleanup')" style="cursor:pointer;">${statusDot('zombie_merged')} ${zombies.length} zombie branches (safe to delete)</div>`;
+  qaHtml += `<div class="action-item" onclick="switchTab('insights');switchInsight('cleanup')" style="cursor:pointer;">${statusDot('merged_stale')} ${stale.length} merged-stale branches (can delete)</div>`;
+  qaHtml += `<div class="action-item" onclick="switchTab('insights');switchInsight('ai')" style="cursor:pointer;">${statusDot('aging')} ${aging.length} aging branches &middot; ${zombies.filter(h=>h.st==='zombie_abandoned').length} abandoned</div>`;
+  qaHtml += `<div class="action-item">${statusDot('healthy')} ${DATA.health.filter(h=>h.st==='healthy').length} healthy branches</div>`;
   qa.innerHTML = qaHtml;
-
-  // Top branches (by score, healthy/aging only)
-  const top = DATA.health.filter(h => h.st === 'healthy' || h.st === 'aging').slice(0, 8);
-  document.getElementById('top-branches').innerHTML = `
-    <h3>Top Branches</h3>
-    ${top.map(h => `<div class="branch-row">
-      ${statusDot(h.st)} <span class="name">${escHtml(h.n)}</span>
-      <span style="color:var(--text-secondary);font-size:10px">${h.cc} commits &middot; ${h.ac} authors &middot; score ${h.sc}</span>
-    </div>`).join('')}`;
-
-  // Needs attention (zombies + stale)
-  const attn = DATA.health.filter(h => ['zombie_merged','zombie_abandoned','merged_stale'].includes(h.st)).slice(0, 10);
-  document.getElementById('needs-attention').innerHTML = `
-    <h3>Needs Attention</h3>
-    ${attn.map(h => `<div class="branch-row">
-      ${statusDot(h.st)} <span class="name">${escHtml(h.n)}</span>
-      <span style="color:var(--text-secondary);font-size:10px">
-        ${h.st==='zombie_merged'?'Merged Zombie':h.st==='zombie_abandoned'?'Abandoned':'Merged Stale'}
-        &middot; ${h.ds}d inactive
-        ${h.wn&&h.wn.length? '&middot; '+h.wn.join(', ') : ''}
-      </span>
-    </div>`).join('')}`;
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// TAB 2: Graph (DAG)
+// OVERVIEW: DORA Metrics with confidence
+// ═══════════════════════════════════════════════════════════════════
+function computeConfidence() {
+  const dr = DATA.dr || {};
+  const localBranches = (DATA.branches || []).filter(b => b.k === 'local' && !['main','master','develop'].includes(b.n));
+  const mergedBranches = localBranches.filter(b => healthLookup[b.n] && healthLookup[b.n].mg);
+  const totalB = localBranches.length || 1;
+  const ltConf = Math.round(mergedBranches.length / totalB * 100);
+  const dfConf = dr.df > 0 ? 80 : 10;
+  const cfrConf = dr.cfr > 0 ? 60 : 10;
+  const mttrConf = dr.mttr > 0 ? 50 : 0;
+  return { lt: ltConf, df: dfConf, cfr: cfrConf, mttr: mttrConf };
+}
+
+function doraTier(metric, value) {
+  // DORA 2024 benchmarks: Elite / High / Medium / Low
+  if (metric === 'df') return value >= 7 ? 'elite' : value >= 1 ? 'high' : value >= 0.25 ? 'medium' : 'low';
+  if (metric === 'lt') return value < 1 ? 'elite' : value < 24 ? 'high' : value < 168 ? 'medium' : 'low';
+  if (metric === 'cfr') return value < 5 ? 'elite' : value < 10 ? 'high' : value < 15 ? 'medium' : 'low';
+  if (metric === 'mttr') return value < 1 ? 'elite' : value < 24 ? 'high' : value < 168 ? 'medium' : 'low';
+  return 'medium';
+}
+
+function renderDORAOverview() {
+  const dr = DATA.dr || {};
+  const lt = dr.lt || {};
+  const cfrPct = (dr.cfr || 0) * 100;
+  const conf = computeConfidence();
+
+  const metrics = [
+    { v: dr.df || 0, l: 'Deployment Frequency', s: 'deploys/week', t: doraTier('df', dr.df || 0), c: conf.df },
+    { v: (lt.med || 0) + 'h', l: 'Lead Time (median)', s: 'P75: ' + (lt.p75 || 0) + 'h', t: doraTier('lt', lt.med || 0), c: conf.lt },
+    { v: cfrPct.toFixed(1) + '%', l: 'Change Failure Rate', s: 'revert/hotfix ratio', t: doraTier('cfr', cfrPct), c: conf.cfr },
+    { v: (dr.mttr || 0) + 'h', l: 'Mean Time to Recovery', s: 'avg recovery time', t: doraTier('mttr', dr.mttr || 0), c: conf.mttr },
+  ];
+
+  document.getElementById('dora-metrics').innerHTML = metrics.map(m => `
+    <div class="dora-metric-card">
+      <div class="dmc-value">${m.v}</div>
+      <div class="dmc-label">${m.l}</div>
+      <div class="dmc-sub">${m.s}</div>
+      <span class="dmc-tier ${m.t}">${m.t}</span>
+      <div class="dmc-confidence">confidence: ~${m.c}%</div>
+    </div>`).join('');
+
+  // Details panel (histogram + PR merge)
+  const raw = lt.raw || [];
+  const histDiv = document.getElementById('lt-histogram');
+  const histLabels = document.getElementById('lt-hist-labels');
+  if (raw.length > 1) {
+    const bins = 10;
+    const maxV = Math.max(...raw, 1);
+    const bucketSize = maxV / bins;
+    const buckets = new Array(bins).fill(0);
+    raw.forEach(v => { const idx = Math.min(bins - 1, Math.floor(v / bucketSize)); buckets[idx]++; });
+    const maxB = Math.max(...buckets, 1);
+    histDiv.innerHTML = buckets.map((b, i) => {
+      const h = Math.max(4, b / maxB * 120);
+      const tier = doraTier('lt', (i + 0.5) * bucketSize);
+      const color = tier === 'elite' ? 'var(--healthy)' : tier === 'high' ? 'var(--text-link)' : tier === 'medium' ? 'var(--aging)' : 'var(--zombie-abandoned)';
+      return `<div class="hist-bar" style="height:${h}px;background:${color};opacity:0.7" title="${Math.round(i*bucketSize)}-${Math.round((i+1)*bucketSize)}h: ${b} branches"></div>`;
+    }).join('');
+    const step = Math.max(1, Math.round(maxV / 4));
+    histLabels.innerHTML = `<span>0h</span><span>${step}h</span><span>${step*2}h</span><span>${step*3}h</span><span>${maxV}h</span>`;
+  } else {
+    histDiv.innerHTML = '<p style="padding:16px;color:var(--text-secondary);font-size:12px;">Insufficient data for histogram.</p>';
+    histLabels.innerHTML = '';
+  }
+
+  // PR merge chart
+  const pr = DATA.pr || {}, mm = pr.merge_methods || {};
+  const total = Math.max(1, (mm.merge || 0) + (mm.squash || 0) + (mm.rebase || 0));
+  document.getElementById('pr-merge-chart').innerHTML = `
+    <div class="pr-merge-bar-wrap"><div class="pr-merge-bar merge" style="height:${(mm.merge||0)/total*100}%"></div><div class="pr-merge-value">${mm.merge||0}</div><div class="pr-merge-label">Merge</div></div>
+    <div class="pr-merge-bar-wrap"><div class="pr-merge-bar squash" style="height:${(mm.squash||0)/total*100}%"></div><div class="pr-merge-value">${mm.squash||0}</div><div class="pr-merge-label">Squash</div></div>
+    <div class="pr-merge-bar-wrap"><div class="pr-merge-bar rebase" style="height:${(mm.rebase||0)/total*100}%"></div><div class="pr-merge-value">${mm.rebase||0}</div><div class="pr-merge-label">Rebase</div></div>`;
+}
+
+// DORA details toggle
+let doraDetailsOpen = false;
+
+// ── OVERVIEW: Pulse Grid ────────────────────────────────────────────
+function renderPulseGrid() {
+  const pu = DATA.pu || {}, ws = pu.ws || {};
+  const weeks = Object.keys(ws).sort();
+  const grid = document.getElementById('pulse-week-grid');
+  if (!weeks.length) {
+    grid.innerHTML = '<p style="padding:16px;color:var(--text-secondary);">No pulse data available.</p>';
+    return;
+  }
+  grid.innerHTML = weeks.slice(-6).reverse().map(w => {
+    const d = ws[w] || {};
+    return `<div class="pulse-week-cell">
+      <div class="pw-date">${w.replace('W',' Week ')}</div>
+      <div class="pw-commits">${d.commits || 0}</div>
+      <div class="pw-meta">${d.branches || 0} branches &middot; ${d.authors || 0} authors</div>
+    </div>`;
+  }).join('');
+}
+
+// ── OVERVIEW: Delivery Pipeline ─────────────────────────────────────
+let activePipelineStage = null;
+
+function renderDeliveryPipeline() {
+  const localBranches = (DATA.branches || []).filter(b =>
+    b.k === 'local' && !['main', 'master', 'develop', 'dev'].includes(b.n)
+  );
+  const excludeMain = b => !['main', 'master', 'develop', 'dev'].includes(b.n);
+
+  // Classify branches by git status
+  const active = [];   // healthy, not merged, recently active (<7d)
+  const stale = [];    // aging (>7d inactive)
+  const review = [];   // healthy, not merged, but older (likely in review)
+  const merged = [];   // merged but not deleted
+
+  DATA.health.forEach(h => {
+    if (!excludeMain(h.n)) return;
+    const branch = DATA.branches.find(b => b.n === h.n);
+    if (!branch) return;
+
+    if (h.mg) { merged.push({...h, kind: branch.k}); }
+    else if (h.st === 'zombie_abandoned') { stale.push({...h, kind: branch.k}); }
+    else if (h.st === 'aging') { stale.push({...h, kind: branch.k}); }
+    else if (h.ds > 3) { review.push({...h, kind: branch.k}); }  // healthy but not touched >3 days
+    else { active.push({...h, kind: branch.k}); }
+  });
+
+  const stages = [
+    { id: 'active', label: 'Active', count: active.length, items: active, color: 'var(--healthy)' },
+    { id: 'stale', label: 'Stale', count: stale.length, items: stale, color: 'var(--aging)' },
+    { id: 'review', label: 'In Review', count: review.length, items: review, color: 'var(--text-link)' },
+    { id: 'merged', label: 'Merged', count: merged.length, items: merged, color: 'var(--zombie-merged)' },
+  ];
+
+  document.getElementById('delivery-pipeline').innerHTML = stages.map((s, i) =>
+    `<div class="pipeline-stage" data-stage="${s.id}" onclick="togglePipelineStage('${s.id}')" style="background:var(--bg-secondary);">
+      <div class="ps-count" style="color:${s.color}">${s.count}</div>
+      <div class="ps-label">${s.label}</div>
+      ${i < stages.length - 1 ? '<span class="ps-arrow">→</span>' : ''}
+    </div>`
+  ).join('');
+
+  if (activePipelineStage) {
+    const detail = document.getElementById('pipeline-detail');
+    detail.classList.add('open');
+    showPipelineDetail(activePipelineStage);
+  }
+}
+
+function togglePipelineStage(stageId) {
+  const detail = document.getElementById('pipeline-detail');
+  if (activePipelineStage === stageId) {
+    detail.classList.remove('open');
+    activePipelineStage = null;
+  } else {
+    activePipelineStage = stageId;
+    showPipelineDetail(stageId);
+    detail.classList.add('open');
+  }
+}
+
+function showPipelineDetail(stageId) {
+  const stages = {
+    active: [], stale: [], review: [], merged: []
+  };
+  const excludeMain = b => !['main', 'master', 'develop', 'dev'].includes(b.n);
+
+  DATA.health.forEach(h => {
+    if (!excludeMain(h.n)) return;
+    const branch = DATA.branches.find(b => b.n === h.n);
+    if (!branch) return;
+    if (h.mg) stages.merged.push({...h, kind: branch.k});
+    else if (h.st === 'zombie_abandoned') stages.stale.push({...h, kind: branch.k});
+    else if (h.st === 'aging') stages.stale.push({...h, kind: branch.k});
+    else if (h.ds > 3) stages.review.push({...h, kind: branch.k});
+    else stages.active.push({...h, kind: branch.k});
+  });
+
+  const items = stages[stageId] || [];
+  const detail = document.getElementById('pipeline-detail');
+  if (!items.length) {
+    detail.innerHTML = '<p style="padding:12px;color:var(--text-secondary);">No branches in this stage.</p>';
+    return;
+  }
+  detail.innerHTML = items.map(h => `
+    <div class="pd-item" onclick="switchTab('graph');setTimeout(function(){toggleBranchHighlight('${escHtml(h.n)}')},200)">
+      ${statusDot(h.st)} <span class="pd-name">${escHtml(h.n)}</span>
+      <span class="pd-meta">${h.cc || 0} commits &middot; ${daysAgo(h.ld)} &middot; ${h.ac || 0} authors</span>
+    </div>`).join('');
+}
+
+// ── OVERVIEW: Risk Banner ───────────────────────────────────────────
+function renderRiskBanner() {
+  const rb = (DATA.pu && DATA.pu.rb) || [];
+  const section = document.getElementById('risk-section');
+  const banner = document.getElementById('risk-banner');
+  if (!rb.length) { section.style.display = 'none'; return; }
+  section.style.display = '';
+  banner.innerHTML = rb.slice(0, 8).map(r => {
+    const sevEmoji = r.severity === 'high' ? '&#x1F534;' : r.severity === 'medium' ? '&#x1F7E0;' : '&#x1F7E1;';
+    return `<div class="risk-item ${r.severity}">
+      <span class="risk-sev">${sevEmoji}</span>
+      <b>${escHtml(r.n)}</b>: ${escHtml(r.reason)}
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// GRAPH: DAG (existing code, preserved)
 // ═══════════════════════════════════════════════════════════════════
 let highlightedBranch = null, panX = 0, panY = 0, scale = 1;
 let isDragging = false, dragStartX = 0, dragStartY = 0, panStartX = 0, panStartY = 0;
@@ -1203,7 +1548,6 @@ function renderGraph() {
     text.setAttribute('class', 'date-marker');
     text.textContent = dm.label;
     dmG.appendChild(text);
-    // Ticks
     const line = document.createElementNS('http://www.w3.org/2000/svg','line');
     line.setAttribute('x1', MARGIN_L - 50);
     line.setAttribute('x2', MARGIN_L - 5);
@@ -1262,11 +1606,10 @@ function renderGraph() {
   DATA.branches.forEach(b => {
     const commit = commitMap[b.h];
     if (!commit) return;
-    const lane = b.l ?? commit.l;
+    const lane = commit.l;
     const lx = cx(lane) + 10;
     const off = labelOffsets[lane] || 0;
     const ly = cy(commit.r) + off * 14 - 3;
-    // Background pill
     const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
     const textEl = document.createElementNS('http://www.w3.org/2000/svg','text');
     textEl.textContent = b.n;
@@ -1279,7 +1622,6 @@ function renderGraph() {
     textEl.setAttribute('fill',
       st==='healthy'?'var(--healthy)':st==='aging'?'var(--aging)':
       st==='zombie_merged'?'var(--zombie-merged)':st==='zombie_abandoned'?'var(--zombie-abandoned)':'var(--merged-stale)');
-    // Approximate rect size
     const approxW = b.n.length * 6 + 12;
     rect.setAttribute('x', lx);
     rect.setAttribute('y', ly);
@@ -1292,7 +1634,6 @@ function renderGraph() {
     labelG.appendChild(textEl);
     textEl.addEventListener('click', ev => { ev.stopPropagation(); toggleBranchHighlight(b.n); });
     textEl.style.pointerEvents = 'auto';
-    labelG.appendChild(textEl);
     labelOffsets[lane] = (labelOffsets[lane] || 0) + 1;
   });
 
@@ -1304,38 +1645,23 @@ function toggleBranchHighlight(name) {
   highlightedBranch = wasSelected ? null : name;
   applyHighlight();
   updateLegendSelection();
-  if (!wasSelected && highlightedBranch) {
-    panToBranch(highlightedBranch);
-  }
+  if (!wasSelected && highlightedBranch) { panToBranch(highlightedBranch); }
 }
 
 function panToBranch(branchName) {
-  // Find the branch tip commit coordinates
   const branch = DATA.branches.find(b => b.n === branchName);
   if (!branch) return;
   const tipCommit = commitMap[branch.h];
   if (!tipCommit) return;
-
-  const targetX = cx(tipCommit.l);
-  const targetY = cy(tipCommit.r);
-
+  const targetX = cx(tipCommit.l), targetY = cy(tipCommit.r);
   const container = document.getElementById('graph-container');
-  const viewW = container.clientWidth;
-  const viewH = container.clientHeight;
-
-  // Target pan: center the commit in viewport
+  const viewW = container.clientWidth, viewH = container.clientHeight;
   const targetPanX = -(targetX * scale) + viewW / 2;
   const targetPanY = -(targetY * scale) + viewH / 3;
-
-  // Smooth animate
   const startPanX = panX, startPanY = panY;
   const startTime = performance.now();
-  const duration = 300; // ms
-
-  function easeInOutCubic(t) {
-    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-  }
-
+  const duration = 300;
+  function easeInOutCubic(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
   function animate(now) {
     const elapsed = now - startTime;
     const t = Math.min(1, elapsed / duration);
@@ -1343,13 +1669,8 @@ function panToBranch(branchName) {
     panX = startPanX + (targetPanX - startPanX) * eased;
     panY = startPanY + (targetPanY - startPanY) * eased;
     applyTransform();
-    if (t < 1) {
-      requestAnimationFrame(animate);
-    } else {
-      updateMinimap();
-    }
+    if (t < 1) requestAnimationFrame(animate); else updateMinimap();
   }
-
   requestAnimationFrame(animate);
 }
 
@@ -1365,12 +1686,8 @@ function applyHighlight() {
   }
   const branchCommits = new Set();
   DATA.commits.forEach(c => { if (c.b && c.b.includes(highlightedBranch)) branchCommits.add(c.h); });
-  circles.forEach(c => {
-    c.classList.toggle('dimmed', !branchCommits.has(c.getAttribute('data-hash')));
-  });
-  labels.forEach(l => {
-    l.classList.toggle('dimmed', l.getAttribute('data-branch') !== highlightedBranch);
-  });
+  circles.forEach(c => { c.classList.toggle('dimmed', !branchCommits.has(c.getAttribute('data-hash'))); });
+  labels.forEach(l => { l.classList.toggle('dimmed', l.getAttribute('data-branch') !== highlightedBranch); });
   edges.forEach(e => {
     const from = e.getAttribute('data-from'), to = e.getAttribute('data-to');
     e.classList.toggle('dimmed', !branchCommits.has(from) && !branchCommits.has(to));
@@ -1379,10 +1696,8 @@ function applyHighlight() {
 
 function buildLegend() {
   const list = document.getElementById('legend-list');
-  const healthMap = {};
-  (DATA.health||[]).forEach(h => { healthMap[h.n] = h; });
   DATA.branches.forEach(b => {
-    const h = healthMap[b.n];
+    const h = healthLookup[b.n];
     const st = h ? h.st : 'healthy';
     const isZ = st === 'zombie_merged' || st === 'zombie_abandoned';
     const item = document.createElement('div');
@@ -1400,7 +1715,6 @@ function updateLegendSelection() {
   });
 }
 
-// Pan/zoom
 function applyTransform() {
   const g = document.getElementById('root-g');
   if (g) g.setAttribute('transform', `translate(${panX},${panY}) scale(${scale})`);
@@ -1414,7 +1728,6 @@ function fitToScreen() {
   applyTransform();
 }
 
-// Minimap
 function updateMinimap() {
   const ms = document.getElementById('minimap-svg');
   const mw = 180, mh = 120;
@@ -1424,8 +1737,6 @@ function updateMinimap() {
   const scaleX = mw / (MARGIN_L + (DATA.metadata.total_lanes + 1) * LANE_W + 100);
   const scaleY = mh / (MARGIN_T + (DATA.metadata.total_rows + 1) * ROW_H + 60);
   const s = Math.min(scaleX, scaleY);
-
-  // Mini commits
   const mg = document.createElementNS('http://www.w3.org/2000/svg','g');
   DATA.commits.forEach(c => {
     const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
@@ -1436,8 +1747,6 @@ function updateMinimap() {
     mg.appendChild(dot);
   });
   ms.appendChild(mg);
-
-  // Viewport rect
   const container = document.getElementById('graph-container');
   const vr = document.createElementNS('http://www.w3.org/2000/svg','rect');
   vr.setAttribute('x', -panX / scale * s);
@@ -1448,7 +1757,6 @@ function updateMinimap() {
   ms.appendChild(vr);
 }
 
-// Detail panel
 function showCommitDetail(hash) {
   const c = commitMap[hash];
   if (!c) return;
@@ -1477,13 +1785,11 @@ function showCommitDetail(hash) {
   panel.querySelectorAll('.parent-link').forEach(link => {
     link.addEventListener('click', ev => { ev.preventDefault(); const h = link.dataset.hash; if (h && commitMap[h]) showCommitDetail(h); });
   });
-  // Fetch changed files if in server mode
   loadChangedFiles(c.h);
 }
 
 function hideDetail() { document.getElementById('detail-panel').classList.remove('visible'); }
 
-// ── Changed Files & Diff Viewer ─────────────────────────────────────
 async function loadChangedFiles(hash) {
   const container = document.getElementById('changed-files-container');
   if (!container) return;
@@ -1518,11 +1824,7 @@ function renderChangedFiles(files, hash, container) {
 
 async function toggleFileDiff(hash, filePath, rowEl) {
   const existing = rowEl.nextElementSibling;
-  if (existing && existing.classList.contains('diff-viewer')) {
-    existing.remove();
-    return;
-  }
-  // Remove any other open diffs
+  if (existing && existing.classList.contains('diff-viewer')) { existing.remove(); return; }
   document.querySelectorAll('.diff-viewer').forEach(d => d.remove());
   const diffDiv = document.createElement('div');
   diffDiv.className = 'diff-viewer';
@@ -1556,11 +1858,7 @@ function renderDiff(diffText, filePath) {
   return html;
 }
 
-// Tooltip
 let tooltipCommit = null;
-const healthLookup = {};
-(DATA.health||[]).forEach(h => { healthLookup[h.n] = h; });
-
 function showTooltip(ev, c) {
   tooltipCommit = c;
   const tt = document.getElementById('tooltip');
@@ -1569,8 +1867,7 @@ function showTooltip(ev, c) {
   html += `<div class="tt-meta">${escHtml(c.a)} &middot; ${fmtDate(c.t)}</div>`;
   if (c.b && c.b.length > 0) {
     html += `<div class="tt-branches">${c.b.map(bn => {
-      const h = healthLookup[bn];
-      const st = h ? h.st : 'healthy';
+      const h = healthLookup[bn]; const st = h ? h.st : 'healthy';
       return `<span class="tt-branch-tag ${st}">${statusDot(st)} ${escHtml(bn)}</span>`;
     }).join('')}</div>`;
   }
@@ -1593,7 +1890,6 @@ function positionTooltip(ev) {
 }
 function hideTooltip() { tooltipCommit = null; document.getElementById('tooltip').classList.remove('visible'); }
 
-// Search
 let searchMatches = [], searchIdx = 0;
 function doSearch() {
   const q = document.getElementById('graph-search').value.trim().toLowerCase();
@@ -1605,17 +1901,16 @@ function doSearch() {
     const hash = c.getAttribute('data-hash');
     const cm = commitMap[hash];
     if (!cm) return;
-    const matches = cm.h.toLowerCase().includes(q) || cm.s.toLowerCase().includes(q) || cm.a.toLowerCase().includes(q);
-    if (matches) searchMatches.push(c); else c.classList.add('dimmed');
+    if (cm.h.toLowerCase().includes(q) || cm.s.toLowerCase().includes(q) || cm.a.toLowerCase().includes(q)) searchMatches.push(c);
+    else c.classList.add('dimmed');
   });
   document.getElementById('match-count').textContent = searchMatches.length ? `${searchMatches.length} matches` : 'No matches';
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// TAB 3: Timeline
+// GRAPH: Timeline sub-view
 // ═══════════════════════════════════════════════════════════════════
 function renderTimeline() {
-  // Heatmap
   const hm = DATA.heatmap || [];
   const grid = document.getElementById('heatmap-grid');
   const labels = document.getElementById('heatmap-labels');
@@ -1638,7 +1933,6 @@ function renderTimeline() {
     labels.innerHTML = lblHtml;
   }
 
-  // Fork/merge timeline SVG
   const tl = DATA.timeline;
   const container = document.getElementById('timeline-graph-container');
   if (!tl || !tl.branches || tl.branches.length === 0) {
@@ -1660,17 +1954,12 @@ function renderTimeline() {
   const g = document.createElementNS('http://www.w3.org/2000/svg','g');
   svg.appendChild(g);
 
-  // Date ruler
   const plotW = W - leftPad - rightPad;
-  const months = [];
   const dMin = new Date(tl.date_min), dMax = new Date(tl.date_max);
   const totalMs = dMax - dMin;
   let cursor = new Date(dMin.getFullYear(), dMin.getMonth(), 1);
   while (cursor <= dMax) {
-    months.push(new Date(cursor));
-    cursor.setMonth(cursor.getMonth() + 1);
-  }
-  months.forEach(m => {
+    const m = new Date(cursor);
     const x = leftPad + ((m - dMin) / totalMs) * plotW;
     const tick = document.createElementNS('http://www.w3.org/2000/svg','line');
     tick.setAttribute('x1', x); tick.setAttribute('x2', x);
@@ -1683,15 +1972,14 @@ function renderTimeline() {
     lbl.setAttribute('font-family', 'var(--font-body)');
     lbl.textContent = m.toISOString().slice(0,7);
     g.appendChild(lbl);
-  });
+    cursor.setMonth(cursor.getMonth() + 1);
+  }
 
-  // Branch rows
   branches.forEach((b, i) => {
     const y = topPad + i * rowH;
     const sx = leftPad + b.sx * plotW;
     const ex = leftPad + b.ex * plotW;
 
-    // Branch name label
     const nameLbl = document.createElementNS('http://www.w3.org/2000/svg','text');
     nameLbl.setAttribute('x', leftPad - 6); nameLbl.setAttribute('y', y + 5);
     nameLbl.setAttribute('text-anchor', 'end');
@@ -1700,15 +1988,11 @@ function renderTimeline() {
     nameLbl.textContent = b.n;
     nameLbl.style.cursor = 'pointer';
     nameLbl.addEventListener('click', () => {
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelector('.tab-btn[data-tab="graph"]').classList.add('active');
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      document.getElementById('graph-tab').classList.add('active');
-      setTimeout(() => toggleBranchHighlight(b.n), 100);
+      switchTab('graph');
+      setTimeout(() => toggleBranchHighlight(b.n), 200);
     });
     g.appendChild(nameLbl);
 
-    // Lifetime line
     const line = document.createElementNS('http://www.w3.org/2000/svg','line');
     line.setAttribute('x1', sx); line.setAttribute('x2', ex);
     line.setAttribute('y1', y); line.setAttribute('y2', y);
@@ -1718,7 +2002,6 @@ function renderTimeline() {
     line.setAttribute('opacity', '0.6');
     g.appendChild(line);
 
-    // Start dot (fork point)
     const sDot = document.createElementNS('http://www.w3.org/2000/svg','circle');
     sDot.setAttribute('cx', sx); sDot.setAttribute('cy', y);
     sDot.setAttribute('r', b.pb ? 4 : 5);
@@ -1728,7 +2011,6 @@ function renderTimeline() {
     sDot.setAttribute('data-hash', b.sh);
     g.appendChild(sDot);
 
-    // End dot (tip)
     const eDot = document.createElementNS('http://www.w3.org/2000/svg','circle');
     eDot.setAttribute('cx', ex); eDot.setAttribute('cy', y);
     eDot.setAttribute('r', 5);
@@ -1736,12 +2018,10 @@ function renderTimeline() {
     eDot.setAttribute('data-hash', b.eh);
     g.appendChild(eDot);
 
-    // Fork line: diagonal from parent branch to this branch's start
     if (b.pb) {
       const pBranch = branches.find(br => br.n === b.pb);
       if (pBranch) {
         const py = topPad + pBranch.row * rowH;
-        // Find parent commit X: use the start X of child (parent commit is just before)
         const px = Math.max(leftPad, sx - 2);
         const forkLine = document.createElementNS('http://www.w3.org/2000/svg','path');
         const cy = (py + y) / 2;
@@ -1761,7 +2041,25 @@ function renderTimeline() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// TAB 4: Authors
+// GRAPH: Lifecycle sub-view
+// ═══════════════════════════════════════════════════════════════════
+function renderLifecycle() {
+  const bl = DATA.branch_lifetimes || [];
+  const container = document.getElementById('lifetime-bars');
+  if (!bl.length) { container.innerHTML = '<p style="color:var(--text-secondary);padding:12px;">No branch lifetime data.</p>'; return; }
+  const sorted = [...bl].filter(b => b.n && !['main','master','develop','dev'].includes(b.n)).sort((a,b) => (a.d || 0) - (b.d || 0));
+  const maxD = Math.max(...sorted.map(b => b.d || 0), 1);
+  container.innerHTML = sorted.map(b =>
+    `<div class="lifetime-row">
+      <span class="lname" onclick="switchTab('graph');setTimeout(function(){toggleBranchHighlight('${escHtml(b.n)}')},200);">${escHtml(b.n)}</span>
+      <div class="lbar-wrap"><div class="lbar ${b.st||'healthy'}" style="width:${(b.d||0)/maxD*100}%"></div></div>
+      <span class="ldur">${b.d||0}d</span>
+    </div>`
+  ).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// INSIGHTS: Authors
 // ═══════════════════════════════════════════════════════════════════
 function renderAuthors() {
   const au = DATA.author_stats || [];
@@ -1792,115 +2090,151 @@ function renderAuthors() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// P1-P5: Extended render functions
+// INSIGHTS: Topology (Branch Relationships)
 // ═══════════════════════════════════════════════════════════════════
+let topoUpstream = {}, topoDownstream = {};
+let topoNodes = [], topoEdges = [];
 
-function renderPulse() {
-  const pu = DATA.pu || {};
-  const ws = pu.ws || {}, rb = pu.rb || [], tr = pu.tr || {};
-  if (!Object.keys(ws).length) return;
-  const weeks = Object.keys(ws).sort();
-  const latest = ws[weeks[weeks.length - 1]] || {};
-  const cc = tr.commits_change_pct || 0, bc = tr.branches_change_pct || 0;
-  let h = '<div class="pulse-banner">';
-  h += `<div class="pulse-card"><div class="pvalue">${latest.commits || 0}</div><div class="plabel">Commits This Week</div><div class="ptrend ${cc > 5 ? 'trend-up' : cc < -5 ? 'trend-down' : 'trend-flat'}">${cc >= 0 ? '+' : ''}${cc}% vs last week</div></div>`;
-  h += `<div class="pulse-card"><div class="pvalue">${latest.branches || 0}</div><div class="plabel">Active Branches</div><div class="ptrend ${bc > 5 ? 'trend-up' : bc < -5 ? 'trend-down' : 'trend-flat'}">${bc >= 0 ? '+' : ''}${bc}%</div></div>`;
-  h += `<div class="pulse-card"><div class="pvalue">${latest.authors || 0}</div><div class="plabel">Active Authors</div></div>`;
-  h += `<div class="pulse-card"><div class="pvalue">${rb.length}</div><div class="plabel">Risk Branches</div></div></div>`;
-  if (rb.length > 0) {
-    h += '<div class="section-card" style="margin-top:8px"><h3>&#x26A0; Risk Branches</h3>';
-    rb.slice(0, 5).forEach(r => { const sev = r.severity === 'high' ? '&#x1F534;' : r.severity === 'medium' ? '&#x1F7E0;' : '&#x1F7E1;'; h += `<div style="padding:4px 0;font-size:12px;">${sev} <b>${escHtml(r.n)}</b>: ${escHtml(r.reason)}</div>`; });
-    h += '</div>';
+function renderTopology() {
+  const dg = DATA.dg || {};
+  topoNodes = dg.ns || [];
+  topoEdges = dg.es || [];
+
+  if (!topoNodes.length) {
+    document.getElementById('topo-container').innerHTML = '<p style="padding:24px;color:var(--text-secondary);">No branch relationship data available. This requires at least one fork/merge relationship in the repo.</p>';
+    document.getElementById('topo-info').innerHTML = 'No topology data.';
+    return;
   }
-  const overviewTab = document.getElementById('overview-tab');
-  const existing = overviewTab.querySelector('.pulse-container');
-  if (existing) existing.remove();
-  const div = document.createElement('div'); div.className = 'pulse-container'; div.innerHTML = h;
-  overviewTab.insertBefore(div, overviewTab.firstChild);
+
+  // Precompute upstream/downstream for O(1) hover
+  topoUpstream = {};
+  topoDownstream = {};
+  topoEdges.forEach(e => {
+    (topoUpstream[e.to] = topoUpstream[e.to] || []).push(e.f);
+    (topoDownstream[e.f] = topoDownstream[e.f] || []).push(e.to);
+  });
+
+  drawTopoGraph(topoNodes, topoEdges);
 }
 
-function renderKanban() {
-  const il = DATA.il || {}, healthLookup = {};
-  (DATA.health || []).forEach(h => { healthLookup[h.n] = h; });
-  const cols = { todo: { label: 'Todo', branches: [] }, in_progress: { label: 'In Progress', branches: [] }, review: { label: 'Review', branches: [] }, done: { label: 'Done', branches: [] } };
-  for (const [k, info] of Object.entries(il)) {
-    const col = cols[info.st] || cols.todo;
-    (info.b || []).forEach(bn => { col.branches.push({ branch: bn, issue: k, health: healthLookup[bn] || {} }); });
+function drawTopoGraph(nodes, edges) {
+  const svg = document.getElementById('topo-svg');
+  const container = document.getElementById('topo-container');
+  const NODE_W = 130, NODE_H = 30, H_GAP = 50, V_GAP = 16, MARGIN = 24;
+
+  // BFS layout
+  const children = {}; nodes.forEach(n => { children[n.n] = n.ch || []; });
+  const hasParent = new Set(edges.map(e => e.to));
+  const roots = nodes.filter(n => !hasParent.has(n.n)).map(n => n.n);
+  if (!roots.length) roots.push(nodes[0].n);
+
+  const layers = [], visited = new Set();
+  let current = roots;
+  while (current.length > 0) {
+    layers.push(current);
+    const next = [];
+    current.forEach(n => { visited.add(n); (children[n] || []).forEach(c => { if (!visited.has(c)) next.push(c); }); });
+    current = [...new Set(next)];
   }
-  const linkedBranches = new Set();
-  for (const info of Object.values(il)) { (info.b || []).forEach(b => linkedBranches.add(b)); }
-  (DATA.branches || []).forEach(b => {
-    if (!linkedBranches.has(b.n) && b.k === 'local' && !['main', 'master', 'develop', 'dev'].includes(b.n)) {
-      const h = healthLookup[b.n] || {};
-      cols[h.mg ? 'done' : h.st === 'aging' ? 'in_progress' : 'todo'].branches.push({ branch: b.n, issue: '', health: h });
+  const maxNodes = Math.max(...layers.map(l => l.length), 1);
+  const totalW = maxNodes * (NODE_W + H_GAP) + MARGIN * 2;
+  const totalH = layers.length * (NODE_H + V_GAP) + MARGIN * 2;
+  svg.setAttribute('viewBox', `0 0 ${totalW} ${totalH}`);
+  svg.innerHTML = '';
+
+  let svgInner = '<defs><marker id="topo-arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="var(--border)"/></marker></defs>';
+
+  const positions = {};
+  const nodeMap = {};
+  nodes.forEach(n => { nodeMap[n.n] = n; });
+
+  layers.forEach((layer, li) => {
+    const y = MARGIN + li * (NODE_H + V_GAP);
+    const layerW = layer.length * (NODE_W + H_GAP);
+    const startX = Math.max(MARGIN, (totalW - layerW) / 2);
+    layer.forEach((name, ni) => {
+      positions[name] = { x: startX + ni * (NODE_W + H_GAP), y };
+    });
+  });
+
+  // Edges
+  edges.forEach(e => {
+    if (positions[e.f] && positions[e.to]) {
+      const fx = positions[e.f].x + NODE_W / 2, fy = positions[e.f].y + NODE_H;
+      const tx = positions[e.to].x + NODE_W / 2, ty = positions[e.to].y;
+      svgInner += `<path class="topo-edge" data-from="${escHtml(e.f)}" data-to="${escHtml(e.to)}" d="M${fx},${fy} C${fx},${(fy+ty)/2} ${tx},${(fy+ty)/2} ${tx},${ty}"/>`;
     }
   });
-  let html = '';
-  for (const col of Object.values(cols)) {
-    html += `<div class="kanban-column"><div class="kanban-column-header">${col.label}<span class="count">${col.branches.length}</span></div><div class="kanban-column-body">`;
-    col.branches.forEach(item => { const h = item.health; html += `<div class="kanban-card" onclick="switchTab('graph');highlightBranch('${escHtml(item.branch)}')"><div class="kc-branch">${statusDot(h.st || 'healthy')} ${escHtml(item.branch)}</div>${item.issue ? '<div class="kc-issue">' + escHtml(item.issue) + '</div>' : ''}<div class="kc-meta"><span>${h.cc || 0} commits</span><span>${(h.ld || '').slice(0, 10)}</span></div></div>`; });
-    html += '</div></div>';
+
+  // Nodes
+  nodes.forEach(n => {
+    const pos = positions[n.n];
+    if (!pos) return;
+    const h = healthLookup[n.n] || {};
+    const st = h.st || 'healthy';
+    const isMain = n.k === 'main' || ['main','master','develop'].includes(n.n);
+    svgInner += `<rect class="topo-node ${st}${isMain?' main-branch':''}" data-node="${escHtml(n.n)}" x="${pos.x}" y="${pos.y}" width="${NODE_W}" height="${NODE_H}" rx="6"
+      onmouseenter="topoHover('${escHtml(n.n)}')" onmouseleave="topoUnhover()"
+      onclick="switchTab('graph');setTimeout(function(){toggleBranchHighlight('${escHtml(n.n)}')},200)"/>`;
+    svgInner += `<text class="topo-label" x="${pos.x + NODE_W/2}" y="${pos.y + NODE_H/2 + 4}" text-anchor="middle">${escHtml(n.n)}</text>`;
+  });
+
+  svg.innerHTML = svgInner;
+  document.getElementById('topo-info').innerHTML = `${nodes.length} branches, ${edges.length} relationships. Hover to explore.`;
+}
+
+function getRelated(nodeName) {
+  const up = new Set();
+  const down = new Set();
+  function walkUp(n) { if (topoUpstream[n]) topoUpstream[n].forEach(p => { if (!up.has(p)) { up.add(p); walkUp(p); } }); }
+  function walkDown(n) { if (topoDownstream[n]) topoDownstream[n].forEach(c => { if (!down.has(c)) { down.add(c); walkDown(c); } }); }
+  walkUp(nodeName);
+  walkDown(nodeName);
+  return { up, down };
+}
+
+function topoHover(nodeName) {
+  const related = getRelated(nodeName);
+  const svg = document.getElementById('topo-svg');
+  svg.querySelectorAll('.topo-node').forEach(n => {
+    const name = n.getAttribute('data-node');
+    if (name === nodeName) return; // keep focused node
+    n.classList.toggle('faded', !related.up.has(name) && !related.down.has(name));
+  });
+  svg.querySelectorAll('.topo-edge').forEach(e => {
+    const from = e.getAttribute('data-from'), to = e.getAttribute('data-to');
+    const isRelated = (from === nodeName || to === nodeName || related.up.has(from) || related.down.has(to) || related.up.has(to) || related.down.has(from));
+    e.classList.toggle('highlight', isRelated);
+    e.classList.toggle('faded', !isRelated);
+  });
+  document.getElementById('topo-info').innerHTML = `<strong>${escHtml(nodeName)}</strong> &mdash; upstream: ${related.up.size} branches, downstream: ${related.down.size} branches`;
+}
+
+function topoUnhover() {
+  const svg = document.getElementById('topo-svg');
+  svg.querySelectorAll('.topo-node').forEach(n => n.classList.remove('faded'));
+  svg.querySelectorAll('.topo-edge').forEach(e => { e.classList.remove('highlight', 'faded'); });
+  document.getElementById('topo-info').innerHTML = `${topoNodes.length} branches, ${topoEdges.length} relationships. Hover to explore.`;
+}
+
+function filterTopo() {
+  const q = (document.getElementById('topo-search')?.value || '').trim().toLowerCase();
+  const svg = document.getElementById('topo-svg');
+  if (!q) {
+    svg.querySelectorAll('.topo-node').forEach(n => n.classList.remove('faded'));
+    svg.querySelectorAll('.topo-edge').forEach(e => e.classList.remove('faded'));
+    return;
   }
-  document.getElementById('kanban-board').innerHTML = html || '<div style="padding:24px;color:var(--text-secondary);">No issue-tracked branches found. Use branch naming: feature/PROJ-123 or fix/ISSUE-456.</div>';
+  svg.querySelectorAll('.topo-node').forEach(n => {
+    const name = n.getAttribute('data-node') || '';
+    n.classList.toggle('faded', !name.toLowerCase().includes(q));
+  });
+  svg.querySelectorAll('.topo-edge').forEach(e => e.classList.add('faded'));
 }
 
-function renderSprints() {
-  const sp = DATA.sp || [], bd = DATA.bd || {};
-  if (!sp.length) return;
-  const overviewTab = document.getElementById('overview-tab');
-  let existing = overviewTab.querySelector('.sprint-section');
-  if (existing) existing.remove();
-  let html = '<div class="sprint-section section-card"><h3>Sprint Analysis</h3><table class="sprint-table"><tr><th>Sprint</th><th>Period</th><th>Planned</th><th>Completed</th><th>Commits</th><th>Scope</th></tr>';
-  sp.slice(-6).reverse().forEach(s => { html += `<tr><td>${escHtml(s.n)}</td><td>${s.st} ~ ${s.ed}</td><td>${s.pb}</td><td>${s.cb}</td><td>${s.cc}</td><td>+${s.sc}</td></tr>`; });
-  html += '</table>';
-  const lastSprint = sp[sp.length - 1];
-  if (lastSprint && bd[lastSprint.n]) { html += `<h3 style="margin-top:12px;font-size:13px;">Burndown: ${escHtml(lastSprint.n)}</h3><svg class="burndown-chart" id="burndown-svg"></svg>`; }
-  html += '</div>';
-  const div = document.createElement('div'); div.className = 'sprint-section'; div.innerHTML = html; overviewTab.appendChild(div);
-  if (lastSprint && bd[lastSprint.n]) {
-    setTimeout(() => {
-      const svg = document.getElementById('burndown-svg'); if (!svg) return;
-      const data = bd[lastSprint.n]; if (!data.length) return;
-      const w = svg.parentElement.clientWidth - 40, h = 150, maxR = Math.max(...data.map(d => d.r), 1);
-      svg.setAttribute('viewBox', `0 0 ${w + 40} ${h + 30}`);
-      const stepX = w / Math.max(1, data.length - 1);
-      let pathD = '', pts = '';
-      data.forEach((d, i) => { const x = 20 + i * stepX, y = 10 + (1 - d.r / maxR) * (h - 20); pathD += (i === 0 ? 'M' : 'L') + `${x},${y} `; pts += x + ',' + y + ' '; });
-      svg.innerHTML = `<line x1="20" y1="${h + 10}" x2="${w + 20}" y2="${h + 10}" stroke="var(--border)"/><line x1="20" y1="10" x2="20" y2="${h + 10}" stroke="var(--border)"/><path d="${pathD}" fill="none" stroke="var(--text-link)" stroke-width="2"/><polygon points="${pts}" fill="var(--text-link)" fill-opacity="0.15"/>`;
-    }, 100);
-  }
-}
-
-function renderDORA() {
-  const dr = DATA.dr || {};
-  if (!Object.keys(dr).length) { document.getElementById('dora-grid').innerHTML = '<p style="color:var(--text-secondary);padding:12px;">DORA metrics unavailable.</p>'; return; }
-  const lt = dr.lt || {}, cfr = (dr.cfr || 0) * 100;
-  document.getElementById('dora-grid').innerHTML = `
-    <div class="dora-card"><div class="dmvalue">${dr.df || 0}</div><div class="dmlabel">Deployment Frequency</div><div class="dmsub">deploys/week</div></div>
-    <div class="dora-card"><div class="dmvalue">${lt.med || 0}h</div><div class="dmlabel">Lead Time (median)</div><div class="dmsub">P75: ${lt.p75 || 0}h</div></div>
-    <div class="dora-card"><div class="dmvalue">${cfr.toFixed(1)}%</div><div class="dmlabel">Change Failure Rate</div><div class="dmsub">revert/hotfix ratio</div></div>
-    <div class="dora-card"><div class="dmvalue">${dr.mttr || 0}h</div><div class="dmlabel">Mean Time to Recovery</div><div class="dmsub">avg recovery</div></div>`;
-  const raw = lt.raw || [];
-  if (raw.length > 1) {
-    const svg = document.getElementById('lead-time-chart'), w = svg.parentElement.clientWidth - 40, h = 180, maxV = Math.max(...raw, 1);
-    svg.setAttribute('viewBox', `0 0 ${w + 40} ${h + 30}`);
-    const stepX = w / Math.max(1, raw.length - 1);
-    let pathD = '';
-    raw.forEach((v, i) => { pathD += (i === 0 ? 'M' : 'L') + `${20 + i * stepX},${10 + (1 - v / maxV) * (h - 20)} `; });
-    svg.innerHTML = `<line x1="20" y1="${h + 10}" x2="${w + 20}" y2="${h + 10}" stroke="var(--border)"/><line x1="20" y1="10" x2="20" y2="${h + 10}" stroke="var(--border)"/><path d="${pathD}" fill="none" stroke="var(--text-link)" stroke-width="1.5"/>`;
-  }
-  const pr = DATA.pr || {}, mm = pr.merge_methods || {}, total = Math.max(1, (mm.merge || 0) + (mm.squash || 0) + (mm.rebase || 0));
-  document.getElementById('pr-methods').innerHTML = `<div style="display:flex;gap:24px;padding:12px;font-size:13px;"><div>Merge: <b>${mm.merge || 0}</b> (${((mm.merge || 0) / total * 100).toFixed(0)}%)</div><div>Squash: <b>${mm.squash || 0}</b> (${((mm.squash || 0) / total * 100).toFixed(0)}%)</div><div>Rebase: <b>${mm.rebase || 0}</b> (${((mm.rebase || 0) / total * 100).toFixed(0)}%)</div></div>`;
-}
-
-function renderChurn() {
-  const ch = DATA.ch || {}, files = ch.files || [], maxCount = files.length ? files[0].count : 1;
-  document.getElementById('churn-treemap').innerHTML = files.length ? files.map(f => {
-    const pct = f.count / maxCount, color = f.hotspot ? '#f85149' : `hsl(210,50%,${20 + pct * 30}%)`;
-    return `<div class="churn-item" style="border-left:3px solid ${color};background:${color}15;"><span class="chname">${escHtml(f.path)}</span>${f.hotspot ? '<span class="hotspot-badge">HOTSPOT</span>' : ''}<span class="chcount">${f.count}</span></div>`;
-  }).join('') : '<p style="padding:12px;color:var(--text-secondary);">No file change data.</p>';
-}
-
+// ═══════════════════════════════════════════════════════════════════
+// INSIGHTS: AI Analysis
+// ═══════════════════════════════════════════════════════════════════
 function renderConflictRisks() {
   const cr = DATA.cr || [];
   document.getElementById('conflict-risks').innerHTML = cr.length ? cr.map(c => {
@@ -1924,41 +2258,40 @@ function processNLQuery(text) {
   } else if (lower.includes('branch') && (lower.includes('not updated') || lower.includes('inactive') || lower.includes('stale'))) {
     const stale = (DATA.health || []).filter(h => h.ds > 14 && !['main', 'master', 'develop'].includes(h.n));
     res.innerHTML = `<b>${stale.length} inactive branches (>14 days):</b><br>` + stale.map(h => `${escHtml(h.n)}: ${h.ds} days`).join('<br>');
-  } else if (lower.includes('conflict')) { switchTab('ai'); }
-  else if (lower.includes('safe to delete') || lower.includes('cleanup')) { switchTab('deps'); }
-  else if (lower.includes('hotspot') || lower.includes('churn')) { switchTab('dora'); }
-  else if (lower.includes('dora') || lower.includes('deploy')) { switchTab('dora'); }
-  else if (lower.includes('release note')) { switchTab('ai'); }
-  else if (lower.includes('depend')) { switchTab('deps'); }
+  } else if (lower.includes('conflict')) { swInsight('ai'); }
+  else if (lower.includes('safe to delete') || lower.includes('cleanup')) { swInsight('cleanup'); }
+  else if (lower.includes('hotspot') || lower.includes('churn') || lower.includes('dora') || lower.includes('deploy')) { switchTab('overview'); }
+  else if (lower.includes('release note')) { swInsight('ai'); }
+  else if (lower.includes('depend') || lower.includes('topology')) { swInsight('topology'); }
   else { res.innerHTML = '<b>Try:</b><br>&bull; "who committed most"<br>&bull; "branches not updated"<br>&bull; "conflict risk"<br>&bull; "safe to delete"<br>&bull; "hotspot files"<br>&bull; "DORA metrics"<br>&bull; "release notes"'; }
 }
 
-function renderDependencyGraph() {
-  const dg = DATA.dg || {}, ns = dg.ns || [], es = dg.es || [];
-  if (!ns.length) { document.getElementById('dep-graph-container').innerHTML = '<p style="padding:24px;color:var(--text-secondary);">No dependency data.</p>'; return; }
-  const svg = document.getElementById('dep-graph-svg'), NODE_W = 140, NODE_H = 32, H_GAP = 60, V_GAP = 20, MARGIN = 20;
-  const children = {}; ns.forEach(n => { children[n.n] = n.ch || []; });
-  const hasParent = new Set(es.map(e => e.to));
-  const roots = ns.filter(n => !hasParent.has(n.n)).map(n => n.n);
-  if (!roots.length) roots.push(ns[0].n);
-  const layers = [], visited = new Set();
-  let current = roots;
-  while (current.length > 0) { layers.push(current); const next = []; current.forEach(n => { visited.add(n); (children[n] || []).forEach(c => { if (!visited.has(c)) next.push(c); }); }); current = [...new Set(next)]; }
-  const maxNodes = Math.max(...layers.map(l => l.length), 1), totalW = maxNodes * (NODE_W + H_GAP) + MARGIN * 2, totalH = layers.length * (NODE_H + V_GAP) + MARGIN * 2;
-  svg.setAttribute('viewBox', `0 0 ${totalW} ${totalH}`); svg.style.width = totalW + 'px'; svg.style.height = totalH + 'px';
-  let svgInner = '<defs><marker id="arrowhead" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="var(--border)"/></marker></defs>';
-  const positions = {};
-  layers.forEach((layer, li) => { const y = MARGIN + li * (NODE_H + V_GAP), layerW = layer.length * (NODE_W + H_GAP), startX = (totalW - layerW) / 2; layer.forEach((name, ni) => { positions[name] = { x: startX + ni * (NODE_W + H_GAP) + H_GAP / 2, y }; }); });
-  es.forEach(e => { if (positions[e.f] && positions[e.to]) { const fx = positions[e.f].x + NODE_W / 2, fy = positions[e.f].y + NODE_H, tx = positions[e.to].x + NODE_W / 2, ty = positions[e.to].y; svgInner += `<path class="dep-edge" d="M${fx},${fy} C${fx},${(fy + ty) / 2} ${tx},${(fy + ty) / 2} ${tx},${ty}"/>`; } });
-  ns.forEach(n => { const pos = positions[n.n]; if (!pos) return; svgInner += `<rect class="dep-node ${n.k === 'main' ? 'main' : ''}" x="${pos.x}" y="${pos.y}" width="${NODE_W}" height="${NODE_H}" rx="6" onclick="highlightBranch('${escHtml(n.n)}');switchTab('graph');"/><text class="dep-label" x="${pos.x + NODE_W / 2}" y="${pos.y + NODE_H / 2 + 4}" text-anchor="middle">${escHtml(n.n)}</text>`; });
-  svg.innerHTML = svgInner;
-}
+function swInsight(name) { switchTab('insights'); setTimeout(() => switchInsight(name), 50); }
 
+// ═══════════════════════════════════════════════════════════════════
+// INSIGHTS: Cleanup
+// ═══════════════════════════════════════════════════════════════════
 function renderCleanupSuggestions() {
   const cl = DATA.cl || [];
-  if (!cl.length) { document.getElementById('cleanup-list').innerHTML = '<p style="padding:12px;color:var(--text-secondary);">All good. No cleanup needed.</p>'; return; }
-  document.getElementById('cleanup-list').innerHTML = cl.map(c => `<div class="cleanup-row"><span class="safe-dot ${c.safe ? 'safe' : 'warn'}"></span><span class="cl-name">${escHtml(c.n)}</span><span class="cl-reason">${escHtml(c.reason)}</span><span class="cl-cmd" onclick="navigator.clipboard.writeText('${c.cmd.replace(/'/g, "\\'")}')" title="Click to copy">${escHtml(c.cmd)}</span></div>`).join('')
-    + `<button class="btn-cleanup-all" onclick="copyAllCleanup()">Copy All Safe Deletions (${cl.filter(c => c.safe).length})</button>`;
+  if (!cl.length) {
+    document.getElementById('cleanup-list').innerHTML = '<p style="padding:12px;color:var(--text-secondary);">All good. No cleanup needed.</p>';
+    return;
+  }
+  const safe = cl.filter(c => c.safe);
+  const needsReview = cl.filter(c => !c.safe);
+  let html = '';
+  if (safe.length) {
+    html += `<div class="cleanup-category"><div class="cc-header">&#x2705; Safe to Delete <span class="cc-count">${safe.length}</span></div>`;
+    html += safe.map(c => `<div class="cleanup-row"><span class="safe-dot safe"></span><span class="cl-name">${escHtml(c.n)}</span><span class="cl-reason">${escHtml(c.reason)}</span><span class="cl-cmd" onclick="event.stopPropagation();navigator.clipboard.writeText('${c.cmd.replace(/'/g,"\\'")}')" title="Click to copy">${escHtml(c.cmd)}</span></div>`).join('');
+    html += '</div>';
+  }
+  if (needsReview.length) {
+    html += `<div class="cleanup-category"><div class="cc-header">&#x26A0;&#xFE0F; Needs Review <span class="cc-count">${needsReview.length}</span></div>`;
+    html += needsReview.map(c => `<div class="cleanup-row"><span class="safe-dot warn"></span><span class="cl-name">${escHtml(c.n)}</span><span class="cl-reason">${escHtml(c.reason)}</span><span class="cl-cmd" onclick="event.stopPropagation();navigator.clipboard.writeText('${c.cmd.replace(/'/g,"\\'")}')" title="Click to copy">${escHtml(c.cmd)}</span></div>`).join('');
+    html += '</div>';
+  }
+  html += `<button class="btn-cleanup-all" onclick="copyAllCleanup()">Copy All Safe Deletions (${safe.length})</button>`;
+  document.getElementById('cleanup-list').innerHTML = html;
 }
 
 function copyAllCleanup() {
@@ -1967,19 +2300,6 @@ function copyAllCleanup() {
 }
 
 function highlightBranch(name) { if (typeof toggleBranchHighlight === 'function') toggleBranchHighlight(name); }
-
-function switchTab(name) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-  const btn = document.querySelector(`[data-tab="${name}"]`), tab = document.getElementById(`${name}-tab`);
-  if (btn) btn.classList.add('active');
-  if (tab) tab.classList.add('active');
-  if (name === 'board') renderKanban();
-  if (name === 'dora') { renderDORA(); renderChurn(); }
-  if (name === 'deps') { renderDependencyGraph(); renderCleanupSuggestions(); }
-  if (name === 'ai') { renderConflictRisks(); renderAISummaries(); }
-  if (name === 'compare') renderComparison();
-}
 
 function renderComparison() {
   const mc = DATA.mc || [];
@@ -2003,18 +2323,22 @@ function initLiveReload() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// Event Wiring
+// EVENT WIRING
 // ═══════════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
-  renderOverview();
-  renderPulse();
-  renderSprints();
+  renderHealthGauge();
+  renderDORAOverview();
+  renderPulseGrid();
+  renderDeliveryPipeline();
+  renderRiskBanner();
   buildLegend();
   renderGraph();
   renderTimeline();
+  renderLifecycle();
   renderAuthors();
   renderConflictRisks();
   renderAISummaries();
+  renderCleanupSuggestions();
   initLiveReload();
 
   // Theme toggle
@@ -2027,6 +2351,20 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       el.dataset.theme = 'light';
       localStorage.setItem('git-graph-theme', 'light');
+    }
+  });
+
+  // DORA details toggle
+  document.getElementById('dora-details-toggle').addEventListener('click', () => {
+    doraDetailsOpen = !doraDetailsOpen;
+    const details = document.getElementById('dora-details');
+    const btn = document.getElementById('dora-details-toggle');
+    if (doraDetailsOpen) {
+      details.classList.add('open');
+      btn.textContent = 'Hide Details';
+    } else {
+      details.classList.remove('open');
+      btn.textContent = 'View Details';
     }
   });
 
@@ -2074,6 +2412,8 @@ document.addEventListener('DOMContentLoaded', () => {
       updateLegendSelection();
       document.getElementById('graph-search').value = '';
       doSearch();
+      if (document.getElementById('palette-overlay').classList.contains('open')) { CommandPalette.close(); return; }
+      if (document.getElementById('shortcuts-modal').classList.contains('open')) { document.getElementById('shortcuts-modal').classList.remove('open'); return; }
     }
     if (ev.key === 'f' && !ev.ctrlKey && !ev.metaKey && document.activeElement === document.body) {
       fitToScreen(); updateMinimap();
@@ -2094,15 +2434,15 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('minimap-svg').addEventListener('click', ev => {
     const rect = ev.target.getBoundingClientRect();
     const mx = ev.clientX - rect.left, my = ev.clientY - rect.top;
-    const s = Math.min(180 / (MARGIN_L + (DATA.metadata.total_lanes+1)*LANE_W+100),
-                       120 / (MARGIN_T + (DATA.metadata.total_rows+1)*ROW_H+60));
+    const s = Math.min(180 / (MARGIN_L + (DATA.metadata.total_lanes+1)*LANE_W+100), 120 / (MARGIN_T + (DATA.metadata.total_rows+1)*ROW_H+60));
     const container = document.getElementById('graph-container');
     panX = -(mx / s) + container.clientWidth / 2 / scale;
     panY = -(my / s) + container.clientHeight / 2 / scale;
     applyTransform();
     updateMinimap();
   });
-  // ── P4: Command Palette + Keyboard Shortcuts ─────────
+
+  // ── Command Palette + Keyboard Shortcuts ─────────
   document.addEventListener('keydown', function(e) {
     var ctrl = e.ctrlKey || e.metaKey;
     if (ctrl && e.key === 'k') { e.preventDefault(); CommandPalette.open(); return; }
@@ -2116,12 +2456,19 @@ document.addEventListener('DOMContentLoaded', () => {
       if (e.key === 'Enter') { e.preventDefault(); CommandPalette.execute(CommandPalette._selectedIndex); return; }
     }
     if (!ctrl && !e.target.closest('input') && !e.target.closest('textarea') && !e.target.closest('[contenteditable]')) {
-      var tabs = ['overview', 'graph', 'timeline', 'authors', 'ai', 'board', 'dora', 'deps'];
+      var tabs = ['overview', 'graph', 'insights'];
       var num = parseInt(e.key);
       if (num >= 1 && num <= tabs.length) { e.preventDefault(); switchTab(tabs[num - 1]); return; }
+      // g-key shortcuts
+      if (e.key === 'o' && window._gKeyPressed) { e.preventDefault(); switchTab('overview'); window._gKeyPressed = false; return; }
+      if (e.key === 'g' && window._gKeyPressed) { e.preventDefault(); switchTab('graph'); window._gKeyPressed = false; return; }
+      if (e.key === 't' && window._gKeyPressed) { e.preventDefault(); switchTab('graph'); switchGraphSub('timeline'); window._gKeyPressed = false; return; }
+      if (e.key === 'a' && window._gKeyPressed) { e.preventDefault(); switchTab('insights'); switchInsight('authors'); window._gKeyPressed = false; return; }
+      if (e.key === 'i' && window._gKeyPressed) { e.preventDefault(); switchTab('insights'); switchInsight('ai'); window._gKeyPressed = false; return; }
+      if (e.key === 'g') { window._gKeyPressed = true; setTimeout(() => { window._gKeyPressed = false; }, 800); return; }
     }
     if (!ctrl && e.key === '?' && !e.target.closest('input')) { e.preventDefault(); document.getElementById('shortcuts-modal').classList.add('open'); }
-    if (e.key === '/' && !e.target.closest('input') && !e.target.closest('textarea')) { e.preventDefault(); var si = document.getElementById('graph-search'); if (si) { switchTab('graph'); setTimeout(function() { si.focus(); }, 100); } }
+    if (e.key === '/' && !e.target.closest('input') && !e.target.closest('textarea')) { e.preventDefault(); switchTab('graph'); setTimeout(function() { var si = document.getElementById('graph-search'); if (si) si.focus(); }, 100); }
   });
   document.getElementById('palette-input').addEventListener('input', function(e) { CommandPalette.search(e.target.value); });
   document.getElementById('palette-overlay').addEventListener('click', function(e) { if (e.target === document.getElementById('palette-overlay')) CommandPalette.close(); });

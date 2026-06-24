@@ -337,9 +337,9 @@ def _lane_for_branch(
     commits: list[Commit],
     commit_map: dict[str, Commit],
 ) -> int:
-    """Return the lane index used by *name* (lookup via its tip commit)."""
-    # Find a commit that has this branch label
-    for c in commits:
+    """Return the lane index used by *name* at its tip commit."""
+    # Walk commits in reverse (newest first) to find the tip's lane
+    for c in reversed(commits):
         if name in c.branches:
             return c.lane
     return 0
